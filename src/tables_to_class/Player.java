@@ -1,4 +1,4 @@
-package tablesToClasses;
+package tables_to_class;
 
 public class Player {
     private int playerID;

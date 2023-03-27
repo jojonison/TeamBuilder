@@ -1,4 +1,4 @@
-package tablesToClasses;
+package tables_to_class;
 
 import java.text.DateFormat;
 
