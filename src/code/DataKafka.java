@@ -1,3 +1,5 @@
+package code;
+
 import java.sql.*;
 import java.util.ArrayList;
 
@@ -8,7 +10,7 @@ public class DataKafka {
 
     public static void setConnection(){
         try {
-            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/kafka","root","");
+            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/kafka?useSSL=false");
         }catch (Exception e){
             System.out.println("Data Connection Failed.");
         }
@@ -37,9 +39,9 @@ public class DataKafka {
             preparedStatement.setString(3, application.getSportName());
             preparedStatement.setString(4, application.getTryOutId());
             preparedStatement.execute();
-            System.out.println("New Application Added");
+            System.out.println("New code.Application Added");
         } catch (SQLException e) {
-            System.out.println("Failed to update Application");
+            System.out.println("Failed to update code.Application");
         }
     }
 
@@ -53,7 +55,7 @@ public class DataKafka {
             preparedStatement.setString(4, application.getTryOutId());
             preparedStatement.execute();
         } catch (SQLException e) {
-            System.out.println("Failed to update Application");
+            System.out.println("Failed to update code.Application");
         }
     }
 
@@ -89,16 +91,17 @@ public class DataKafka {
             }
             resultSet.close();
         }catch (Exception e){
-            System.out.println("Could not Find Application");
+            System.out.println("Could not Find code.Application");
         }
         return application;
     }
 
     public static ArrayList<Application> getApplicationByTryOutId(String tryoutId) throws Exception{
-        ArrayList<Application> applications = new ArrayList<Application>();
+        ArrayList<Application> applications = new ArrayList<>();
         String query = "SELECT * FROM application WHERE tryoutid=?";
         Application application = null;
         try{
+
             PreparedStatement preparedStatement = connection.prepareStatement(query,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
             preparedStatement.setString(1, tryoutId);
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -109,9 +112,9 @@ public class DataKafka {
             }
             resultSet.close();
         }catch (Exception e){
-            System.out.println("Could not Find Application");
+            System.out.println("Could not Find code.Application");
         }
-        return application;
+        return applications;
     }
 
     public static void closeConnection() throws Exception{

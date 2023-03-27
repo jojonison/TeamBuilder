@@ -1,4 +1,5 @@
-import javax.swing.*;
+package code;
+
 import java.util.*;
 
 public class JavaKafka {
@@ -7,16 +8,16 @@ public class JavaKafka {
     public static String studentId = null;
     public static String sportName = null;
     public static String tryOutId = null;
-    public static ArrayList<Application> list = new ArrayList<Application>();
+    public static ArrayList<Application> list = new ArrayList<>();
 
     public static void displayAllApplication(){
         for (Application application: list){
-            System.out.printf("%-20s %-20s %-15s \n", application.getApplicationId(),application.getStudentId(),application.getSportName(),application.getTryOutId());
+            System.out.printf("%-20s %-20s %-20s %-15s \n", application.getApplicationId(),application.getStudentId(),application.getSportName(),application.getTryOutId());
         }
     }
 
     public static void searchByApplicationId(){
-        System.out.println("Enter Application Id: ");
+        System.out.println("Enter code.Application Id: ");
         applicationId = scanner.next();
         list.clear();
         list = DataKafka.findApplication(applicationId);
@@ -25,12 +26,12 @@ public class JavaKafka {
         }
 
         if(list.isEmpty()){
-            System.out.println("Application Id not Found");
+            System.out.println("code.Application Id not Found");
         }
     }
 
     public static void updateApplication(String num){
-        System.out.println("Enter Application Id: ");
+        System.out.println("Enter code.Application Id: ");
         applicationId = scanner.next();
         System.out.println("Enter Student Id: ");
         studentId = scanner.next();
@@ -52,14 +53,14 @@ public class JavaKafka {
             System.out.printf("%-20s %-20s %-15s \n", application.getApplicationId(),application.getStudentId(),application.getSportName(),application.getTryOutId());
 
             System.out.println();
-            System.out.println("Update Application? (y/n): ");
+            System.out.println("Update code.Application? (y/n): ");
              String update = scanner.next();
 
              if (update.equalsIgnoreCase("y")){
                  updateApplication(studentId);
              }
         }else {
-            System.out.println("Application data not Found.");
+            System.out.println("code.Application data not Found.");
         }
     }
 
@@ -73,7 +74,7 @@ public class JavaKafka {
             System.out.printf("%-20s %-20s %-15s \n", application.getApplicationId(),application.getStudentId(),application.getSportName(),application.getTryOutId());
         }
         if (list.isEmpty()){
-            System.out.println("Application data not Found");
+            System.out.println("code.Application data not Found");
         }
     }
 
@@ -97,7 +98,7 @@ public class JavaKafka {
 
             System.out.println("Choose what to do");
             System.out.println("1. Display");
-            System.out.println("2. Search by Application Id");
+            System.out.println("2. Search by code.Application Id");
             System.out.println("3. Search by Student Id");
             System.out.println("4. Search by tryOut Id");
             System.out.println("5. add application data");
@@ -105,24 +106,29 @@ public class JavaKafka {
             System.out.print("choice: ");
             int choice = scanner.nextInt();
 
-            switch (choice){
-                case 1: displayAllApplication();
+            switch (choice) {
+                case 1 -> {
+                    displayAllApplication();
                     System.out.println();
-                    break;
-                case 2: searchByApplicationId();
+                }
+                case 2 -> {
+                    searchByApplicationId();
                     System.out.println();
-                    break;
-                case 3: searchByStudentId();
+                }
+                case 3 -> {
+                    searchByStudentId();
                     System.out.println();
-                    break;
-                case 4: searchByTryOutId();
+                }
+                case 4 -> {
+                    searchByTryOutId();
                     System.out.println();
-                    break;
-                case 5: addApplication();
+                }
+                case 5 -> {
+                    addApplication();
                     System.out.println();
-                    break;
-                case 6: System.exit(0);
-                default: System.out.println("Invalid Input");
+                }
+                case 6 -> System.exit(0);
+                default -> System.out.println("Invalid Input");
             }
         }
     }
