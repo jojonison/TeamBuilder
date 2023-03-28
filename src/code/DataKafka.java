@@ -21,7 +21,7 @@ public class DataKafka {
 
     public static ArrayList<Sport> getSport() throws  Exception{
         ArrayList<Sport> sports = new ArrayList<Sport>();
-        String query = "SELECT * FROM application ORDER BY applicationid";
+        String query = "SELECT * FROM sport ORDER BY sportid";
         Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_UPDATABLE);
         ResultSet resultSet = statement.executeQuery(query);
 
@@ -85,7 +85,7 @@ public class DataKafka {
 
     public static Sport findSportBySportID(String sportID){
         Sport sport = null;
-        String query = "SELECT * FROM application WHERE studentid = ?";
+        String query = "SELECT * FROM sport WHERE sportid = ?";
         try{
             PreparedStatement preparedStatement = connection.prepareStatement(query,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
             preparedStatement.setString(1, sportID);
