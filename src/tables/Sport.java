@@ -1,23 +1,23 @@
 package tables;
 
 public class Sport {
-    private String sportID;
+    private int sportID;
     private String sportName;
     private String sportType;
     private String availability;
 
-    public Sport(String sportID, String sportName, String sportType, String availability) {
+    public Sport(int sportID, String sportName, String sportType, String availability) {
         this.sportID = sportID;
         this.sportName = sportName;
         this.sportType = sportType;
         this.availability = availability;
     }
 
-    public String getSportID() {
+    public int getSportID() {
         return sportID;
     }
 
-    public void setSportID(String sportID) {
+    public void setSportID(int sportID) {
         this.sportID = sportID;
     }
 

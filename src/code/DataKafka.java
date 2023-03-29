@@ -12,9 +12,18 @@ public class DataKafka {
 
     public static void setConnection(){
         try {
-            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/kafka?useSSL=false","root","");
+            //String URL= "jdbc:mysql://127.0.0.1:3306/db_example?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=CONVERT_TO_NULL&serverTimezone=GMT";
+            //for mysql version 8:
+            //"jdbc:mysql://127.0.0.1:3306/kafka2?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=CONVERT_TO_NULL&serverTimezone=GMT";
+//            String URL_mysql_version8 =
+//                    "jdbc:mysql://127.0.0.1:3306/kafka2?useSSL=false&" +
+//                    "useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&serverTimezone=GMT";
+            String URL_mysql_version5 = "jdbc:mysql://127.0.0.1:3306/kafka?useSSL=false";
+            Class.forName("com.mysql.jdbc.Driver").newInstance();
+            connection = DriverManager.getConnection(URL_mysql_version5,"root","");
             //as long as wampserver is on, and kafka schema is imported in mysql workbench, this works ???
         }catch (Exception e){
+            e.printStackTrace();
             System.out.println("Data Connection Failed.");
         }
     }
@@ -26,7 +35,12 @@ public class DataKafka {
         ResultSet resultSet = statement.executeQuery(query);
 
         while (resultSet.next()){
-            Sport sport = new Sport(resultSet.getString(1),resultSet.getString(2), resultSet.getString(3), resultSet.getString(4));
+            Sport sport = new Sport(
+                    resultSet.getInt(1),
+                    resultSet.getString(2),
+                    resultSet.getString(3),
+                    resultSet.getString(4)
+            );
             sports.add(sport);
         }
         resultSet.close();
@@ -37,7 +51,7 @@ public class DataKafka {
         String query = "INSERT INTO sport(sportid,sportname,sporttype,availability) VALUES(?,?,?,?)";
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(query,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            preparedStatement.setString(1, sport.getSportID());
+            preparedStatement.setInt(1, sport.getSportID());
             preparedStatement.setString(2, sport.getSportName());
             preparedStatement.setString(3, sport.getSportType());
             preparedStatement.setString(4, sport.getAvailability());
@@ -48,16 +62,18 @@ public class DataKafka {
         }
     }
 
-    public static void updateSport(Sport sport, String sportID){
+    public static void updateSport(Sport sport, int sportID){
         String query = "UPDATE sport SET sportid=?, sportname=?, sporttype=?, availability=? WHERE sportid=?";
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(query,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            preparedStatement.setString(1, sport.getSportID());
+            preparedStatement.setInt(1, sport.getSportID());
             preparedStatement.setString(2, sport.getSportName());
             preparedStatement.setString(3, sport.getSportType());
             preparedStatement.setString(4, sport.getAvailability());
+            preparedStatement.setInt(5,sportID);
             preparedStatement.execute();
         } catch (SQLException e) {
+            e.printStackTrace();
             System.out.println("Failed to update sport.");
         }
     }
@@ -73,7 +89,7 @@ public class DataKafka {
             ResultSet resultSet = preparedStatement.executeQuery();
             resultSet.beforeFirst();
             while (resultSet.next()){
-                sport = new Sport(resultSet.getString(1),resultSet.getString(2),resultSet.getString(3),resultSet.getString(4));
+                sport = new Sport(resultSet.getInt(1),resultSet.getString(2),resultSet.getString(3),resultSet.getString(4));
                 sports.add(sport);
             }
             resultSet.close();
@@ -83,16 +99,16 @@ public class DataKafka {
         return sports;
     }
 
-    public static Sport findSportBySportID(String sportID){
+    public static Sport findSportBySportID(int sportID){
         Sport sport = null;
         String query = "SELECT * FROM sport WHERE sportid = ?";
         try{
             PreparedStatement preparedStatement = connection.prepareStatement(query,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            preparedStatement.setString(1, sportID);
+            preparedStatement.setInt(1, sportID);
             ResultSet resultSet = preparedStatement.executeQuery();
             resultSet.beforeFirst();
             while (resultSet.next()){
-                sport = new Sport(resultSet.getString(1),resultSet.getString(2),resultSet.getString(3),resultSet.getString(4));
+                sport = new Sport(resultSet.getInt(1),resultSet.getString(2),resultSet.getString(3),resultSet.getString(4));
             }
             resultSet.close();
         }catch (Exception e){

@@ -2,11 +2,14 @@ package code;
 
 import tables.Sport;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.*;
 
 public class JavaKafka {
-    public static Scanner scanner = new Scanner(System.in);
-    public static String sportID = null;
+    public static BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+    public static int sportID;
     public static String sportName = null;
     public static String sportType = null;
     public static String availability = null;
@@ -14,13 +17,13 @@ public class JavaKafka {
 
     public static void createSport() throws Exception{
         System.out.println("Create Sport ID: ");
-        sportID = scanner.next();
+        sportID = Integer.parseInt(bufferedReader.readLine());
         System.out.println("Create Sport Name: ");
-        sportName = scanner.next();
+        sportName = bufferedReader.readLine();
         System.out.println("Create Sport Type: ");
-        sportType = scanner.next();
+        sportType = bufferedReader.readLine();
         System.out.println("Create Availability: ");
-        availability = scanner.next();
+        availability = bufferedReader.readLine();
 
         Sport sport = new Sport(sportID, sportName, sportType, availability);
         DataKafka.createSport(sport);
@@ -32,13 +35,13 @@ public class JavaKafka {
         }
     }
 
-    public static void updateSport(String sportID){
+    public static void updateSport(int sportID) throws IOException {
         System.out.println("Update Sport Name for " + sportID + " :");
-        sportName = scanner.next();
+        sportName = bufferedReader.readLine();
         System.out.println("Update Sport Type for " + sportID + " :");
-        sportType = scanner.next();
+        sportType = bufferedReader.readLine();
         System.out.println("Update Availability for " + sportID + " :");
-        availability = scanner.next();
+        availability = bufferedReader.readLine();
 
         Sport sport = new Sport(sportID,sportName,sportType,availability);
         DataKafka.updateSport(sport, sportID);
@@ -46,7 +49,7 @@ public class JavaKafka {
 
     public static void searchBySportId() throws Exception {
         System.out.println("Enter Sport ID: ");
-        sportID = scanner.next();
+        sportID = Integer.parseInt(bufferedReader.readLine());
         Sport sport = DataKafka.findSportBySportID(sportID);
 
         if(sport !=null){
@@ -54,7 +57,7 @@ public class JavaKafka {
 
             System.out.println();
             System.out.println("Update Sport? (y/n): ");
-            String update = scanner.next();
+            String update = bufferedReader.readLine();
 
             if (update.equalsIgnoreCase("y")){
                 updateSport(sportID);
@@ -74,9 +77,9 @@ public class JavaKafka {
             System.out.println("3. Update a sport");
             System.out.println("4. Delete a sport");
             System.out.println("5. Find a sport");
-            System.out.println("5. Exit");
+            System.out.println("6. Exit");
             System.out.print("Choice: ");
-            int choice = scanner.nextInt();
+            int choice = Integer.parseInt(bufferedReader.readLine());
 
             switch (choice) {
                 case 1 -> {
@@ -89,7 +92,7 @@ public class JavaKafka {
                 }
                 case 3 -> {
                     System.out.println("Enter Sport ID:");
-                    sportID = scanner.next();
+                    sportID = Integer.parseInt(bufferedReader.readLine());
                     updateSport(sportID);
                     System.out.println();
                 }
@@ -101,8 +104,8 @@ public class JavaKafka {
                     System.out.println();
                 }
                 case 6 -> {
-                    System.exit(0);
                     DataKafka.closeConnection();
+                    System.exit(0);
                 }
                 default -> System.out.println("Invalid Input.");
             }
