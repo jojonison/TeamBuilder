@@ -44,4 +44,8 @@ public class Sport {
     public void setAvailability(String availability) {
         this.availability = availability;
     }
+
+    public String toString() {
+        return (sportID + "\t\t" + sportName + "\t\t" +  sportType + "\t\t" +  availability);
+    }
 }

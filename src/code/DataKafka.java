@@ -56,7 +56,8 @@ public class DataKafka {
             preparedStatement.setString(3, sport.getSportType());
             preparedStatement.setString(4, sport.getAvailability());
             preparedStatement.execute();
-            System.out.println("New sport added.");
+            System.out.println("Sport with the following details is added: \n" + sport.toString());
+
         } catch (SQLException e) {
             System.out.println("Failed to add sport.");
         }
@@ -72,31 +73,23 @@ public class DataKafka {
             preparedStatement.setString(4, sport.getAvailability());
             preparedStatement.setInt(5,sportID);
             preparedStatement.execute();
+            System.out.println("Sport " + sportID + " updated.");
         } catch (SQLException e) {
             e.printStackTrace();
             System.out.println("Failed to update sport.");
         }
     }
 
-    public static ArrayList<Sport> getSportBySportId(String sportId) throws Exception{
-        ArrayList<Sport> sports = new ArrayList<>();
-        String query = "SELECT * FROM sport WHERE sportid=?";
-        Sport sport = null;
-        try{
-
+    public static void deleteSport(int sportID){
+        String query = "DELETE from sport where sportid = ?";
+        try {
             PreparedStatement preparedStatement = connection.prepareStatement(query,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            preparedStatement.setString(1, sportId);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            resultSet.beforeFirst();
-            while (resultSet.next()){
-                sport = new Sport(resultSet.getInt(1),resultSet.getString(2),resultSet.getString(3),resultSet.getString(4));
-                sports.add(sport);
-            }
-            resultSet.close();
-        }catch (Exception e){
-            System.out.println("Could not Find code.Application");
+            preparedStatement.setInt(1, sportID);
+            preparedStatement.execute();
+            System.out.println("Sport " + sportID + " deleted.");
+        } catch (SQLException e) {
+            System.out.println("Failed to delete sport.");
         }
-        return sports;
     }
 
     public static Sport findSportBySportID(int sportID){
@@ -112,7 +105,7 @@ public class DataKafka {
             }
             resultSet.close();
         }catch (Exception e){
-            System.out.println("Could not Find Student");
+            System.out.println("Could not find sport " + sportID + " .");
         }
         return sport;
     }

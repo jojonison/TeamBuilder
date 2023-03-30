@@ -30,21 +30,47 @@ public class JavaKafka {
     }
 
     public static void readAllSports(){
+        System.out.printf("%-20s %-20s %-20s %-15s \n", "--------", "----------", "----------", "------------");
+        System.out.printf("%-20s %-20s %-20s %-15s \n", "Sport ID", "Sport Name", "Sport Type", "Availability");
+        System.out.printf("%-20s %-20s %-20s %-15s \n", "--------", "----------", "----------", "------------");
         for (Sport sport: list){
             System.out.printf("%-20s %-20s %-20s %-15s \n", sport.getSportID(), sport.getSportName(), sport.getSportType(), sport.getAvailability());
         }
     }
 
     public static void updateSport(int sportID) throws IOException {
-        System.out.println("Update Sport Name for " + sportID + " :");
-        sportName = bufferedReader.readLine();
-        System.out.println("Update Sport Type for " + sportID + " :");
-        sportType = bufferedReader.readLine();
-        System.out.println("Update Availability for " + sportID + " :");
-        availability = bufferedReader.readLine();
+        Sport sports = DataKafka.findSportBySportID(sportID);
 
-        Sport sport = new Sport(sportID,sportName,sportType,availability);
-        DataKafka.updateSport(sport, sportID);
+        if(sports !=null) {
+            System.out.println("Update Sport Name for " + sportID + ": ");
+            sportName = bufferedReader.readLine();
+            System.out.println("Update Sport Type for " + sportID + ": ");
+            sportType = bufferedReader.readLine();
+            System.out.println("Update Availability for " + sportID + ": ");
+            availability = bufferedReader.readLine();
+
+            Sport sport = new Sport(sportID, sportName, sportType, availability);
+            DataKafka.updateSport(sport, sportID);
+        } else {
+            System.out.println("Sport ID not found.");
+        }
+    }
+
+    public static void deleteSport(int sportID) throws IOException {
+        Sport sport = DataKafka.findSportBySportID(sportID);
+        if(sport !=null){
+            System.out.printf("%-20s %-20s %-20s %-15s \n", "Sport details: ", sport.getSportName(), sport.getSportType(), sport.getAvailability());
+
+            System.out.println();
+            System.out.println("Delete this sport? (y/n): ");
+            String delete = bufferedReader.readLine();
+
+            if (delete.equalsIgnoreCase("y")){
+                DataKafka.deleteSport(sportID);
+            }
+        }else {
+            System.out.println("Sport ID not found.");
+        }
     }
 
     public static void searchBySportId() throws Exception {
@@ -53,15 +79,7 @@ public class JavaKafka {
         Sport sport = DataKafka.findSportBySportID(sportID);
 
         if(sport !=null){
-            System.out.printf("%-20s %-20s %-15s \n", sport.getSportID(), sport.getSportName(), sport.getSportType(), sport.getAvailability());
-
-            System.out.println();
-            System.out.println("Update Sport? (y/n): ");
-            String update = bufferedReader.readLine();
-
-            if (update.equalsIgnoreCase("y")){
-                updateSport(sportID);
-            }
+            System.out.printf("%-20s %-20s %-20s %-15s \n", sport.getSportID(), sport.getSportName(), sport.getSportType(), sport.getAvailability());
         }else {
             System.out.println("Sport ID not Found.");
         }
@@ -97,7 +115,10 @@ public class JavaKafka {
                     System.out.println();
                 }
                 case 4 -> {
-                    // TO DO
+                    System.out.println("Enter Sport ID:");
+                    sportID = Integer.parseInt(bufferedReader.readLine());
+                    deleteSport(sportID);
+                    System.out.println();
                 }
                 case 5 -> {
                     searchBySportId();
