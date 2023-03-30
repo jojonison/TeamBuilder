@@ -40,7 +40,6 @@ public class JavaKafka {
 
     public static void updateSport(int sportID) throws IOException {
         Sport sports = DataKafka.findSportBySportID(sportID);
-
         if(sports !=null) {
             System.out.println("Update Sport Name for " + sportID + ": ");
             sportName = bufferedReader.readLine();
@@ -73,11 +72,8 @@ public class JavaKafka {
         }
     }
 
-    public static void searchBySportId() throws Exception {
-        System.out.println("Enter Sport ID: ");
-        sportID = Integer.parseInt(bufferedReader.readLine());
+    public static void searchBySportId(int sportID) {
         Sport sport = DataKafka.findSportBySportID(sportID);
-
         if(sport !=null){
             System.out.printf("%-20s %-20s %-20s %-15s \n", sport.getSportID(), sport.getSportName(), sport.getSportType(), sport.getAvailability());
         }else {
@@ -121,7 +117,9 @@ public class JavaKafka {
                     System.out.println();
                 }
                 case 5 -> {
-                    searchBySportId();
+                    System.out.println("Enter Sport ID: ");
+                    sportID = Integer.parseInt(bufferedReader.readLine());
+                    searchBySportId(sportID);
                     System.out.println();
                 }
                 case 6 -> {
