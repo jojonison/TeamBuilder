@@ -12,16 +12,7 @@ public class DataKafka {
 
     public static void setConnection(){
         try {
-            //String URL= "jdbc:mysql://127.0.0.1:3306/db_example?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=CONVERT_TO_NULL&serverTimezone=GMT";
-            //for mysql version 8:
-            //"jdbc:mysql://127.0.0.1:3306/kafka2?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=CONVERT_TO_NULL&serverTimezone=GMT";
-//            String URL_mysql_version8 =
-//                    "jdbc:mysql://127.0.0.1:3306/kafka2?useSSL=false&" +
-//                    "useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&serverTimezone=GMT";
-            String URL_mysql_version5 = "jdbc:mysql://127.0.0.1:3306/kafka?useSSL=false";
-            Class.forName("com.mysql.jdbc.Driver").newInstance();
-            connection = DriverManager.getConnection(URL_mysql_version5,"root","");
-            //as long as wampserver is on, and kafka schema is imported in mysql workbench, this works ???
+            connection = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/kafka?useSSL=false","root","");
         }catch (Exception e){
             e.printStackTrace();
             System.out.println("Data Connection Failed.");
