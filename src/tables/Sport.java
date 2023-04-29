@@ -13,9 +13,7 @@ public class Sport {
         this.availability = availability;
     }
 
-    public int getSportID() {
-        return sportID;
-    }
+    public int getSportID() {return sportID;}
 
     public void setSportID(int sportID) {
         this.sportID = sportID;

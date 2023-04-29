@@ -3,14 +3,16 @@ package tables;
 public class Application {
     private int applicationID;
     private int studentID;
-    private String sportName;
+    private int sportID;
     private int tryoutID;
+    private String approvalStatus;
 
-    public Application(int applicationID, int studentID, String sportName, int tryoutID) {
+    public Application(int applicationID, int studentID, int sportID, int tryoutID, String approvalStatus) {
         this.applicationID = applicationID;
         this.studentID = studentID;
-        this.sportName = sportName;
+        this.sportID = sportID;
         this.tryoutID = tryoutID;
+        this.approvalStatus = approvalStatus;
     }
 
     public int getApplicationID() {
@@ -29,12 +31,10 @@ public class Application {
         this.studentID = studentID;
     }
 
-    public String getSportName() {
-        return sportName;
-    }
+    public int getSportID() {return sportID;}
 
-    public void setSportName(String sportName) {
-        this.sportName = sportName;
+    public void setSportID(int sportID) {
+        this.sportID = sportID;
     }
 
     public int getTryoutID() {
@@ -44,4 +44,10 @@ public class Application {
     public void setTryoutID(int tryoutID) {
         this.tryoutID = tryoutID;
     }
+
+    public String getApprovalStatus() {
+        return approvalStatus;
+    }
+
+    public void setApprovalStatus(String approvalStatus) {this.approvalStatus = approvalStatus;}
 }

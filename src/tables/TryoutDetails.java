@@ -4,10 +4,18 @@ import java.text.DateFormat;
 
 public class TryoutDetails {
     private int tryoutID;
-    private String sportName;
-    private DateFormat schedule;
+    private int sportID;
+    private String schedule;
     private String location;
     private int coachID;
+
+    public TryoutDetails(int tryoutID, int sportID, String schedule, String location, int coachID) {
+        this.tryoutID = tryoutID;
+        this.sportID = sportID;
+        this.schedule = schedule;
+        this.location = location;
+        this.coachID = coachID;
+    }
 
     public int getTryoutID() {
         return tryoutID;
@@ -17,19 +25,17 @@ public class TryoutDetails {
         this.tryoutID = tryoutID;
     }
 
-    public String getSportName() {
-        return sportName;
+    public int getSportID() {return sportID;}
+
+    public void setSportID(int sportID) {
+        this.sportID = sportID;
     }
 
-    public void setSportName(String sportName) {
-        this.sportName = sportName;
-    }
-
-    public DateFormat getSchedule() {
+    public String getSchedule() {
         return schedule;
     }
 
-    public void setSchedule(DateFormat schedule) {
+    public void setSchedule(String schedule) {
         this.schedule = schedule;
     }
 
@@ -46,14 +52,6 @@ public class TryoutDetails {
     }
 
     public void setCoachID(int coachID) {
-        this.coachID = coachID;
-    }
-
-    public TryoutDetails(int tryoutID, String sportName, DateFormat schedule, String location, int coachID) {
-        this.tryoutID = tryoutID;
-        this.sportName = sportName;
-        this.schedule = schedule;
-        this.location = location;
         this.coachID = coachID;
     }
 }

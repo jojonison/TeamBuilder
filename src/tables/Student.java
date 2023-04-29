@@ -5,6 +5,15 @@ public class Student {
     private String firstName;
     private String lastName;
     private String emailAddress;
+    private String departmentKey;
+    private int applicationID;
+
+    public Student(int studentID, String firstName, String lastName, String emailAddress) {
+        this.studentID = studentID;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.emailAddress = emailAddress;
+    }
 
     public int getStudentID() {
         return studentID;
@@ -38,10 +47,19 @@ public class Student {
         this.emailAddress = emailAddress;
     }
 
-    public Student(int studentID, String firstName, String lastName, String emailAddress) {
-        this.studentID = studentID;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.emailAddress = emailAddress;
+    public String getDepartmentKey() {
+        return departmentKey;
+    }
+
+    public void setDepartmentKey(String departmentKey) {
+        this.departmentKey = departmentKey;
+    }
+
+    public int getApplicationID() {
+        return applicationID;
+    }
+
+    public void setApplicationID(int applicationID) {
+        this.applicationID = applicationID;
     }
 }

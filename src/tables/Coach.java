@@ -4,15 +4,15 @@ public class Coach {
     private int coachID;
     private String firstName;
     private String lastName;
-    private String department;
-    private String sportName;
+    private int sportID;
+    private String departmentKey;
 
-    public Coach(int coachID, String firstName, String lastName, String department, String sportName) {
+    public Coach(int coachID, String firstName, String lastName, int sportID, String departmentKey) {
         this.coachID = coachID;
         this.firstName = firstName;
         this.lastName = lastName;
-        this.department = department;
-        this.sportName = sportName;
+        this.sportID = sportID;
+        this.departmentKey = departmentKey;
     }
 
     public int getCoachID() {
@@ -39,19 +39,19 @@ public class Coach {
         this.lastName = lastName;
     }
 
-    public String getDepartment() {
-        return department;
+    public int getSportID() {
+        return sportID;
     }
 
-    public void setDepartment(String department) {
-        this.department = department;
+    public void setSportID(int sportID) {
+        this.sportID = sportID;
     }
 
-    public String getSportName() {
-        return sportName;
+    public String getDepartmentKey() {
+        return departmentKey;
     }
 
-    public void setSportName(String sportName) {
-        this.sportName = sportName;
+    public void setDepartmentKey(String departmentKey) {
+        this.departmentKey = departmentKey;
     }
 }

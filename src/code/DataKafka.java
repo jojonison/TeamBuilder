@@ -1,6 +1,6 @@
 package code;
 
-import tables.Sport;
+import tables.*;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -19,7 +19,47 @@ public class DataKafka {
         }
     }
 
-    public static ArrayList<Sport> getSport() throws  Exception{
+    public static ArrayList<Application> getApplications() throws  Exception{
+        ArrayList<Application> applications = new ArrayList<Application>();
+        String query = "SELECT * FROM application ORDER BY applicationid";
+        Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_UPDATABLE);
+        ResultSet resultSet = statement.executeQuery(query);
+
+        while (resultSet.next()){
+            Application application = new Application(
+                    resultSet.getInt(1),
+                    resultSet.getInt(2),
+                    resultSet.getInt(3),
+                    resultSet.getInt(4),
+                    resultSet.getString(5)
+            );
+            applications.add(application);
+        }
+        resultSet.close();
+        return applications;
+    }
+
+    public static ArrayList<Coach> getCoaches() throws  Exception{
+        ArrayList<Coach> coaches = new ArrayList<Coach>();
+        String query = "SELECT * FROM coach ORDER BY coachid";
+        Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_UPDATABLE);
+        ResultSet resultSet = statement.executeQuery(query);
+
+        while (resultSet.next()){
+            Coach coach = new Coach(
+                    resultSet.getInt(1),
+                    resultSet.getString(2),
+                    resultSet.getString(3),
+                    resultSet.getInt(4),
+                    resultSet.getString(5)
+            );
+            coaches.add(coach);
+        }
+        resultSet.close();
+        return coaches;
+    }
+
+    public static ArrayList<Sport> getSports() throws  Exception{
         ArrayList<Sport> sports = new ArrayList<Sport>();
         String query = "SELECT * FROM sport ORDER BY sportid";
         Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_UPDATABLE);
@@ -36,6 +76,26 @@ public class DataKafka {
         }
         resultSet.close();
         return sports;
+    }
+
+    public static ArrayList<TryoutDetails> getTryouts() throws  Exception{
+        ArrayList<TryoutDetails> tryouts = new ArrayList<TryoutDetails>();
+        String query = "SELECT * FROM tryoutdetails ORDER BY tryoutid";
+        Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_UPDATABLE);
+        ResultSet resultSet = statement.executeQuery(query);
+
+        while (resultSet.next()){
+            TryoutDetails tryout = new TryoutDetails(
+                    resultSet.getInt(1),
+                    resultSet.getInt(2),
+                    resultSet.getString(3),
+                    resultSet.getString(4),
+                    resultSet.getInt(5)
+            );
+            tryouts.add(tryout);
+        }
+        resultSet.close();
+        return tryouts;
     }
 
     public static void createSport(Sport sport){
