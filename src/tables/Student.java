@@ -6,13 +6,13 @@ public class Student {
     private String lastName;
     private String emailAddress;
     private String departmentKey;
-    private int applicationID;
 
-    public Student(int studentID, String firstName, String lastName, String emailAddress) {
+    public Student(int studentID, String firstName, String lastName, String emailAddress, String departmentKey) {
         this.studentID = studentID;
         this.firstName = firstName;
         this.lastName = lastName;
         this.emailAddress = emailAddress;
+        this.departmentKey = departmentKey;
     }
 
     public int getStudentID() {
@@ -53,13 +53,5 @@ public class Student {
 
     public void setDepartmentKey(String departmentKey) {
         this.departmentKey = departmentKey;
-    }
-
-    public int getApplicationID() {
-        return applicationID;
-    }
-
-    public void setApplicationID(int applicationID) {
-        this.applicationID = applicationID;
     }
 }
