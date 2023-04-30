@@ -61,8 +61,8 @@ public class JavaKafkaAdmin {
                 int choice = Integer.parseInt(bufferedReader.readLine());
 
                 switch (choice) {
-                    case 1: DataKafka.changeApplicationStatus(applicationID, "Accepted");
-                    case 2: DataKafka.changeApplicationStatus(applicationID, "Denied");
+                    case 1: DataKafka.updateApplicationStatus(applicationID, "Accepted");
+                    case 2: DataKafka.updateApplicationStatus(applicationID, "Denied");
                     case 3: mainMenu();
                 }
             } else {
@@ -72,7 +72,7 @@ public class JavaKafkaAdmin {
                 if (change.equalsIgnoreCase("y")) {
                     System.out.println("Enter New Approval Status: ");
                     String approvalStatus = bufferedReader.readLine();
-                    DataKafka.changeApplicationStatus(applicationID, approvalStatus);
+                    DataKafka.updateApplicationStatus(applicationID, approvalStatus);
                 }
             }
         } else {

@@ -57,7 +57,7 @@ public class DataKafka {
         return application;
     }
 
-    public static void changeApplicationStatus(int applicationID, String approvalStatus) {
+    public static void updateApplicationStatus(int applicationID, String approvalStatus) {
         String query = "UPDATE application SET approvalstatus=? WHERE applicationid=?";
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(query,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
@@ -89,6 +89,81 @@ public class DataKafka {
         }
         resultSet.close();
         return coaches;
+    }
+
+    public static void createCoach(Coach coach){
+        String query = "INSERT INTO coach(coachid,firstname,lastname,sportid,departmentkey) VALUES(?,?,?,?,?)";
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(query,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            preparedStatement.setInt(1, coach.getCoachID());
+            preparedStatement.setString(2, coach.getFirstName());
+            preparedStatement.setString(3, coach.getLastName());
+            preparedStatement.setInt(4, coach.getSportID());
+            preparedStatement.setString(5, coach.getDepartmentKey());
+            preparedStatement.execute();
+            System.out.println("Coach with the following details is added: \n" + coach.toString());
+
+        } catch (SQLException e) {
+            System.out.println("Failed to add coach.");
+        }
+    }
+
+    public static void updateCoachSport(int coachID, int sportID){
+        String query = "UPDATE coach SET sportid=? WHERE coachid=?";
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(query,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            preparedStatement.setInt(1, sportID);
+            preparedStatement.setInt(2, coachID);
+            preparedStatement.execute();
+            System.out.println("Coach " + coachID + " assigned to Sport" + sportID + ".");
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("Failed to assign Coach " + coachID + " to Sport " + sportID + ".");
+        }
+    }
+
+    public static void updateCoachDepartment(int coachID, String departmentKey){
+        String query = "UPDATE coach SET departmentkey=? WHERE coachid=?";
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(query,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            preparedStatement.setString(1, departmentKey);
+            preparedStatement.setInt(2, coachID);
+            preparedStatement.execute();
+            System.out.println("Coach " + coachID + " assigned to Department" + departmentKey + ".");
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("Failed to assign Coach " + coachID + " to Department " + departmentKey + ".");
+        }
+    }
+
+    public static void deleteCoach(int coachID){
+        String query = "DELETE from coach where coachid = ?";
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(query,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            preparedStatement.setInt(1, coachID);
+            preparedStatement.execute();
+            System.out.println("Coach " + coachID + " removed.");
+        } catch (SQLException e) {
+            System.out.println("Failed to remove coach.");
+        }
+    }
+
+    public static Coach findCoachByCoachID(int coachID){
+        Coach coach = null;
+        String query = "SELECT * FROM coach WHERE coachid = ?";
+        try{
+            PreparedStatement preparedStatement = connection.prepareStatement(query,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            preparedStatement.setInt(1, coachID);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            resultSet.beforeFirst();
+            while (resultSet.next()){
+                coach = new Coach(resultSet.getInt(1), resultSet.getString(2), resultSet.getString(3), resultSet.getInt(4), resultSet.getString(5));
+            }
+            resultSet.close();
+        }catch (Exception e){
+            System.out.println("Could not find coach " + coachID + " .");
+        }
+        return coach;
     }
 
     public static ArrayList<Department> getDepartments() throws  Exception{
@@ -229,7 +304,6 @@ public class DataKafka {
         }
         return sport;
     }
-
 
     public static void closeConnection() throws Exception{
         if(connection != null){
