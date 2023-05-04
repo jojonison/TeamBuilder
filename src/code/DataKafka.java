@@ -52,7 +52,7 @@ public class DataKafka {
             }
             resultSet.close();
         }catch (Exception e){
-            System.out.println("Could not find sport " + applicationID + " .");
+            System.out.println("Could not find application " + applicationID + " .");
         }
         return application;
     }
@@ -164,23 +164,6 @@ public class DataKafka {
             System.out.println("Could not find coach " + coachID + " .");
         }
         return coach;
-    }
-
-    public static ArrayList<Department> getDepartments() throws  Exception{
-        ArrayList<Department> departments = new ArrayList<Department>();
-        String query = "SELECT * FROM department ORDER BY departmentkey";
-        Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_UPDATABLE);
-        ResultSet resultSet = statement.executeQuery(query);
-
-        while (resultSet.next()){
-            Department department = new Department(
-                    resultSet.getString(1),
-                    resultSet.getString(2)
-            );
-            departments.add(department);
-        }
-        resultSet.close();
-        return departments;
     }
 
     public static ArrayList<Sport> getSports() throws  Exception{
@@ -308,6 +291,7 @@ public class DataKafka {
     public static void closeConnection() throws Exception{
         if(connection != null){
             connection.close();
+            System.exit(0);
         }
     }
 }

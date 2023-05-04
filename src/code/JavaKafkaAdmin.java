@@ -21,8 +21,6 @@ public class JavaKafkaAdmin {
     public static String coachDepartmentKey;
     public static ArrayList<Coach> coachesList;
 
-    public static ArrayList<Department> departmentsList;
-
     public static int sportID;
     public static String sportName;
     public static String sportType;
@@ -86,15 +84,6 @@ public class JavaKafkaAdmin {
         System.out.printf("%-20s %-20s %-20s %-15s %-15s \n", "--------", "----------", "---------", "--------", "--------------");
         for (Coach coach: coachesList){
             System.out.printf("%-20s %-20s %-20s %-15s %-15s \n", coach.getCoachID(), coach.getFirstName(), coach.getLastName(), coach.getSportID(), coach.getDepartmentKey());
-        }
-    }
-
-    public static void readAllDepartments(){
-        System.out.printf("%-20s %-20s \n", "--------------", "---------------");
-        System.out.printf("%-20s %-20s \n", "Department Key", "Department Name");
-        System.out.printf("%-20s %-20s \n", "--------------", "---------------");
-        for (Department department: departmentsList){
-            System.out.printf("%-20s %-20s \n", department.getDepartmentKey(), department.getDepartmentName());
         }
     }
 
@@ -182,23 +171,38 @@ public class JavaKafkaAdmin {
         }
     }
 
-    public static void mainMenu() throws Exception{
-        while (true){
-            applicationsList = DataKafka.getApplications();
-            coachesList = DataKafka.getCoaches();
-            departmentsList = DataKafka.getDepartments();
-            sportsList = DataKafka.getSports();
-            studentsList = DataKafka.getStudents();
-            tryoutsList = DataKafka.getTryouts();
-
-            System.out.println("\nChoose what to do: ");
+    public static void mainMenu() throws Exception {
+            System.out.println("\n------MAIN MENU------");
             System.out.println("1. View Applications");
             System.out.println("2. View Coaches");
-            System.out.println("3. View Departments");
-            System.out.println("4. View Sports");
-            System.out.println("5. View Students");
-            System.out.println("6. View Tryout Details");
-            System.out.println("7. Exit");
+            System.out.println("3. View Sports");
+            System.out.println("4. View Students");
+            System.out.println("5. View Tryout Details");
+            System.out.println("6. Exit");
+            System.out.print("Choice: ");
+            int choice = Integer.parseInt(bufferedReader.readLine());
+
+            switch (choice) {
+                case 1 : applicationsMenu();
+                case 2 : coachesMenu();
+                case 3 : sportsMenu();
+                case 4 : studentsMenu();
+                case 5 : tryoutsMenu();
+                case 6 : DataKafka.closeConnection();
+                default : System.out.println("Invalid Input.");
+            }
+    }
+
+    public static void applicationsMenu() throws Exception {
+        while (true) {
+            applicationsList = DataKafka.getApplications();
+
+            System.out.println("\nView by: ");
+            System.out.println("1. All Applications");
+            System.out.println("2. Approval Status");
+            System.out.println("3. Department");
+            System.out.println("4. Sport");
+            System.out.println("5. Back to Main Menu");
             System.out.print("Choice: ");
             int choice = Integer.parseInt(bufferedReader.readLine());
 
@@ -210,29 +214,55 @@ public class JavaKafkaAdmin {
                     searchByApplicationID(applicationID);
                 }
                 case 2 -> {
-                    readAllCoaches();
-                    System.out.println();
+                    System.out.println("\nEnter Approval Status: ");
+                    // applications under a certain approval status will be displayed
                 }
                 case 3 -> {
-                    readAllDepartments();
-                    System.out.println();
+                    System.out.println("\nEnter Department Key: ");
+                    // applications under a certain department will be displayed
                 }
                 case 4 -> {
-                    readAllSports();
-                    sportsMenu();
-                    System.out.println();
+                    System.out.println("\nEnter Sport Name: ");
+                    // applications under a certain sport name will be displayed
                 }
                 case 5 -> {
-                    readAllStudents();
+                    mainMenu();
                     System.out.println();
                 }
-                case 6 -> {
-                    readAllTryouts();
-                    System.out.println();
+                default -> System.out.println("Invalid Input.");
+            }
+        }
+    }
+
+    public static void coachesMenu() throws Exception{
+        while (true){
+            coachesList = DataKafka.getCoaches();
+
+            System.out.println("\nView By: ");
+            System.out.println("1. All Coaches");
+            System.out.println("2. Sport");
+            System.out.println("3. Department");
+            System.out.println("4. Back to Main Menu");
+            System.out.print("Choice: ");
+            int choice = Integer.parseInt(bufferedReader.readLine());
+
+            switch (choice) {
+                case 1 -> {
+                    readAllCoaches();
+                    System.out.println("\nSelect Coach ID: ");
+                    // after selecting a coach, admin can edit or remove the coach
                 }
-                case 7 -> {
-                    DataKafka.closeConnection();
-                    System.exit(0);
+                case 2 -> {
+                    System.out.println("\nEnter Sport Name: ");
+                    // coaches under a certain sport name will be displayed
+                }
+                case 3 -> {
+                    System.out.println("\nEnter Department Key: ");
+                    // coaches under a certain department key will be displayed
+                }
+                case 4 -> {
+                    mainMenu();
+                    System.out.println();
                 }
                 default -> System.out.println("Invalid Input.");
             }
@@ -243,12 +273,11 @@ public class JavaKafkaAdmin {
         while (true){
             sportsList = DataKafka.getSports();
 
+            readAllSports();
             System.out.println("\nChoose what to do: ");
-            System.out.println("1. Create a sport");
-            System.out.println("2. Update a sport");
-            System.out.println("3. Delete a sport");
-            System.out.println("4. Find a sport");
-            System.out.println("5. Back to Main Menu");
+            System.out.println("1. Create a Sport");
+            System.out.println("2. Select Sport ID");
+            System.out.println("3. Back to Main Menu");
             System.out.print("Choice: ");
             int choice = Integer.parseInt(bufferedReader.readLine());
 
@@ -258,24 +287,79 @@ public class JavaKafkaAdmin {
                     System.out.println();
                 }
                 case 2 -> {
-                    System.out.println("Enter Sport ID:");
-                    sportID = Integer.parseInt(bufferedReader.readLine());
-                    updateSport(sportID);
-                    System.out.println();
+                    System.out.println("\nEnter Sport ID:");
+                    // after selecting a sport, admin can edit or remove the sport
                 }
                 case 3 -> {
-                    System.out.println("Enter Sport ID:");
-                    sportID = Integer.parseInt(bufferedReader.readLine());
-                    deleteSport(sportID);
+                    mainMenu();
                     System.out.println();
+                }
+                default -> System.out.println("Invalid Input.");
+            }
+        }
+    }
+
+    public static void studentsMenu() throws Exception {
+        while (true) {
+            studentsList = DataKafka.getStudents();
+
+            readAllStudents();
+            System.out.println("\nChoose what to do: ");
+            System.out.println("1. Add a Student");
+            System.out.println("2. Select Student ID");
+            System.out.println("3. View Students by Department");
+            System.out.println("4. Back to Main Menu");
+            System.out.print("Choice: ");
+            int choice = Integer.parseInt(bufferedReader.readLine());
+
+            switch (choice) {
+                case 1 -> {
+                    // call method for creating a new student account
+                }
+                case 2 -> {
+                    System.out.println("\nEnter Student ID: ");
+                    // after selecting a student, admin can edit or remove the student
+                }
+                case 3 -> {
+                    System.out.println("\nEnter Department Key: ");
+                    // students under a certain department key will be displayed
                 }
                 case 4 -> {
-                    System.out.println("Enter Sport ID: ");
-                    sportID = Integer.parseInt(bufferedReader.readLine());
-                    searchBySportId(sportID);
+                    mainMenu();
                     System.out.println();
                 }
-                case 5 -> {
+                default -> System.out.println("Invalid Input.");
+            }
+        }
+    }
+
+    public static void tryoutsMenu() throws Exception {
+        while (true) {
+            tryoutsList = DataKafka.getTryouts();
+
+            System.out.println("\nView By: ");
+            System.out.println("1. All Tryouts");
+            System.out.println("2. Coach");
+            System.out.println("3. Sport");
+            System.out.println("4. Back to Main Menu");
+            System.out.print("Choice: ");
+            int choice = Integer.parseInt(bufferedReader.readLine());
+
+            switch (choice) {
+                case 1 -> {
+                    readAllTryouts();
+                    System.out.println("Select Tryout ID: ");
+                    // after selecting a tryout, admin can edit or remove the tryout
+                }
+                case 2 -> {
+                    System.out.println("Enter Coach Name: ");
+                    // tryouts under a certain coach name will be displayed
+                }
+                case 3 -> {
+                    System.out.println("Enter Sport Name: ");
+                    // tryouts under a certain sport name will be displayed
+                }
+                case 4 -> {
                     mainMenu();
                     System.out.println();
                 }
