@@ -19,7 +19,7 @@ public class DataKafka {
         }
     }
 
-    public static ArrayList<Application> getApplications() throws  Exception{
+    public static ArrayList<Application> getApplications() throws Exception{
         ArrayList<Application> applications = new ArrayList<Application>();
         String query = "SELECT * FROM application ORDER BY applicationid";
         Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_UPDATABLE);
@@ -56,6 +56,70 @@ public class DataKafka {
         }
         return application;
     }
+
+    public static ArrayList<Application> findApplicationsByApprovalStatus(String approvalStatus) {
+        ArrayList<Application> applications = new ArrayList<>();
+        String query = "SELECT * FROM application WHERE approvalstatus = ? ORDER BY applicationid";
+        try{
+            PreparedStatement preparedStatement = connection.prepareStatement(query, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            preparedStatement.setString(1, approvalStatus);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()){
+                Application application = new Application(resultSet.getInt(1), resultSet.getInt(2), resultSet.getInt(3), resultSet.getInt(4), resultSet.getString(5));
+                applications.add(application);
+            }
+            resultSet.close();
+        } catch (Exception e){
+            System.out.println("Could not find '" + approvalStatus  + "' applications.");
+        }
+        return applications;
+    }
+
+    public static ArrayList<Application> findApplicationsByDepartmentKey(String departmentKey){
+        ArrayList<Application> applications = new ArrayList<>();
+        String query = "SELECT application.applicationid, application.studentid, application.sportid, application.tryoutid, application.approvalstatus " +
+                "FROM application " +
+                "JOIN student ON application.studentid = student.studentid " +
+                "NATURAL JOIN department WHERE department.departmentkey = ? " +
+                "ORDER BY applicationid;";
+        try{
+            PreparedStatement preparedStatement = connection.prepareStatement(query,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            preparedStatement.setString(1, departmentKey);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            resultSet.beforeFirst();
+            while (resultSet.next()){
+                Application application = new Application(resultSet.getInt(1), resultSet.getInt(2), resultSet.getInt(3), resultSet.getInt(4), resultSet.getString(5));
+                applications.add(application);
+            }
+            resultSet.close();
+        }catch (Exception e){
+            System.out.println("Could not find applications under " + departmentKey + " department.");
+        }
+        return applications;
+    }
+
+    public static ArrayList<Application> findApplicationsBySportName(String sportName){
+        ArrayList<Application> applications = new ArrayList<>();
+        String query = "SELECT application.applicationid, application.studentid, application.sportid, application.tryoutid, application.approvalstatus " +
+                "FROM application " +
+                "NATURAL JOIN sport WHERE sport.sportname = ? " +
+                "ORDER BY applicationid;";
+        try{
+            PreparedStatement preparedStatement = connection.prepareStatement(query,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            preparedStatement.setString(1, sportName);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            resultSet.beforeFirst();
+            while (resultSet.next()){
+                Application application = new Application(resultSet.getInt(1), resultSet.getInt(2), resultSet.getInt(3), resultSet.getInt(4), resultSet.getString(5));
+                applications.add(application);
+            }
+            resultSet.close();
+        }catch (Exception e){
+            System.out.println("Could not find '" + sportName  + "' applications.");
+        }
+        return applications;
+    }
+
 
     public static void updateApplicationStatus(int applicationID, String approvalStatus) {
         String query = "UPDATE application SET approvalstatus=? WHERE applicationid=?";

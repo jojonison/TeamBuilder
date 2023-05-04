@@ -11,29 +11,10 @@ import java.util.*;
 public class JavaKafkaAdmin {
     public static BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
 
-    public static int applicationID;
     public static ArrayList<Application> applicationsList;
-
-    public static int coachID;
-    public static String coachFirstName;
-    public static String coachLastName;
-    public static int coachSportID;
-    public static String coachDepartmentKey;
     public static ArrayList<Coach> coachesList;
-
-    public static int sportID;
-    public static String sportName;
-    public static String sportType;
-    public static String availability;
     public static ArrayList<Sport> sportsList;
-
     public static ArrayList<Student> studentsList;
-
-    public static int tryoutID;
-    public static int tryoutSportID;
-    public static DateFormat tryoutSchedule;
-    public static String tryoutLocation;
-    public static int tryoutCoachID;
     public static ArrayList<TryoutDetails> tryoutsList;
 
     public static void readAllApplications(){
@@ -78,6 +59,69 @@ public class JavaKafkaAdmin {
         }
     }
 
+    public static void sortApplicationsByApprovalStatus(String approvalStatus) throws Exception {
+        ArrayList<Application> byApprovalStatus = DataKafka.findApplicationsByApprovalStatus(approvalStatus);
+        if (!byApprovalStatus.isEmpty()){
+            for (Application application : byApprovalStatus) {
+                System.out.printf("%-20s %-20s %-20s %-15s %-15s \n", application.getApplicationID(), application.getStudentID(), application.getSportID(), application.getTryoutID(), application.getApprovalStatus());
+            }
+            System.out.println("\nSelect Application ID: ");
+            int applicationID = Integer.parseInt(bufferedReader.readLine());
+
+            for (Application application : byApprovalStatus) {
+                if (applicationID == application.getApplicationID()) {
+                    searchByApplicationID(applicationID);
+                    return;
+                }
+            }
+            System.out.println("Invalid Application ID.");
+        } else {
+            System.out.println("No applications found with approval status: " + approvalStatus);
+        }
+    }
+
+    public static void sortApplicationsByDepartmentKey(String departmentKey) throws Exception {
+        ArrayList<Application> byDepartmentKey = DataKafka.findApplicationsByDepartmentKey(departmentKey);
+        if (!byDepartmentKey.isEmpty()){
+            for (Application application : byDepartmentKey) {
+                System.out.printf("%-20s %-20s %-20s %-15s %-15s \n", application.getApplicationID(), application.getStudentID(), application.getSportID(), application.getTryoutID(), application.getApprovalStatus());
+            }
+            System.out.println("\nSelect Application ID: ");
+            int applicationID = Integer.parseInt(bufferedReader.readLine());
+
+            for (Application application : byDepartmentKey) {
+                if (applicationID == application.getApplicationID()) {
+                    searchByApplicationID(applicationID);
+                    return;
+                }
+            }
+            System.out.println("Invalid Application ID.");
+        } else {
+            System.out.println("No applications found with department key: " + departmentKey);
+        }
+    }
+
+    public static void sortApplicationsBySportName(String sportName) throws Exception {
+        ArrayList<Application> bySportName = DataKafka.findApplicationsBySportName(sportName);
+        if (!bySportName.isEmpty()){
+            for (Application application : bySportName) {
+                System.out.printf("%-20s %-20s %-20s %-15s %-15s \n", application.getApplicationID(), application.getStudentID(), application.getSportID(), application.getTryoutID(), application.getApprovalStatus());
+            }
+            System.out.println("\nSelect Application ID: ");
+            int applicationID = Integer.parseInt(bufferedReader.readLine());
+
+            for (Application application : bySportName) {
+                if (applicationID == application.getApplicationID()) {
+                    searchByApplicationID(applicationID);
+                    return;
+                }
+            }
+            System.out.println("Invalid Application ID.");
+        } else {
+            System.out.println("No applications found with sport name: " + sportName);
+        }
+    }
+
     public static void readAllCoaches(){
         System.out.printf("%-20s %-20s %-20s %-15s %-15s \n", "--------", "----------", "---------", "--------", "--------------");
         System.out.printf("%-20s %-20s %-20s %-15s %-15s \n", "Coach ID", "First Name", "Last Name", "Sport ID", "Department Key");
@@ -107,13 +151,13 @@ public class JavaKafkaAdmin {
 
     public static void createSport() throws Exception{
         System.out.println("Create Sport ID: ");
-        sportID = Integer.parseInt(bufferedReader.readLine());
+        int sportID = Integer.parseInt(bufferedReader.readLine());
         System.out.println("Create Sport Name: ");
-        sportName = bufferedReader.readLine();
+        String sportName = bufferedReader.readLine();
         System.out.println("Create Sport Type: ");
-        sportType = bufferedReader.readLine();
+        String sportType = bufferedReader.readLine();
         System.out.println("Create Availability: ");
-        availability = bufferedReader.readLine();
+        String availability = bufferedReader.readLine();
 
         Sport sport = new Sport(sportID, sportName, sportType, availability);
         DataKafka.createSport(sport);
@@ -132,11 +176,11 @@ public class JavaKafkaAdmin {
         Sport sports = DataKafka.findSportBySportID(sportID);
         if(sports !=null) {
             System.out.println("Update Sport Name for " + sportID + ": ");
-            sportName = bufferedReader.readLine();
+            String sportName = bufferedReader.readLine();
             System.out.println("Update Sport Type for " + sportID + ": ");
-            sportType = bufferedReader.readLine();
+            String sportType = bufferedReader.readLine();
             System.out.println("Update Availability for " + sportID + ": ");
-            availability = bufferedReader.readLine();
+            String availability = bufferedReader.readLine();
 
             Sport sport = new Sport(sportID, sportName, sportType, availability);
             DataKafka.updateSport(sport, sportID);
@@ -210,20 +254,23 @@ public class JavaKafkaAdmin {
                 case 1 -> {
                     readAllApplications();
                     System.out.println("\nSelect Application ID: ");
-                    applicationID = Integer.parseInt(bufferedReader.readLine());
+                    int applicationID = Integer.parseInt(bufferedReader.readLine());
                     searchByApplicationID(applicationID);
                 }
                 case 2 -> {
                     System.out.println("\nEnter Approval Status: ");
-                    // applications under a certain approval status will be displayed
+                    String approvalStatus = bufferedReader.readLine();
+                    sortApplicationsByApprovalStatus(approvalStatus);
                 }
                 case 3 -> {
                     System.out.println("\nEnter Department Key: ");
-                    // applications under a certain department will be displayed
+                    String departmentKey = bufferedReader.readLine();
+                    sortApplicationsByDepartmentKey(departmentKey);
                 }
                 case 4 -> {
                     System.out.println("\nEnter Sport Name: ");
-                    // applications under a certain sport name will be displayed
+                    String sportName = bufferedReader.readLine();
+                    sortApplicationsBySportName(sportName);
                 }
                 case 5 -> {
                     mainMenu();
