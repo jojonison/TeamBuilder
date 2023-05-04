@@ -172,31 +172,21 @@ public class DataKafka {
         }
     }
 
-    public static void updateCoachSport(int coachID, int sportID){
-        String query = "UPDATE coach SET sportid=? WHERE coachid=?";
+    public static void updateCoach(Coach coach, int coachID){
+        String query = "UPDATE coach SET coachid=?, firstname=?, lastname=?, sportid=?, departmentkey WHERE coachid=?";
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(query,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            preparedStatement.setInt(1, sportID);
-            preparedStatement.setInt(2, coachID);
+            preparedStatement.setInt(1, coach.getCoachID());
+            preparedStatement.setString(2, coach.getFirstName());
+            preparedStatement.setString(3, coach.getLastName());
+            preparedStatement.setInt(4,coach.getSportID());
+            preparedStatement.setString(5, coach.getDepartmentKey());
+            preparedStatement.setInt(5, coachID);
             preparedStatement.execute();
-            System.out.println("Coach " + coachID + " assigned to Sport" + sportID + ".");
+            System.out.println("Coach " + coachID + " updated.");
         } catch (SQLException e) {
             e.printStackTrace();
-            System.out.println("Failed to assign Coach " + coachID + " to Sport " + sportID + ".");
-        }
-    }
-
-    public static void updateCoachDepartment(int coachID, String departmentKey){
-        String query = "UPDATE coach SET departmentkey=? WHERE coachid=?";
-        try {
-            PreparedStatement preparedStatement = connection.prepareStatement(query,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            preparedStatement.setString(1, departmentKey);
-            preparedStatement.setInt(2, coachID);
-            preparedStatement.execute();
-            System.out.println("Coach " + coachID + " assigned to Department" + departmentKey + ".");
-        } catch (SQLException e) {
-            e.printStackTrace();
-            System.out.println("Failed to assign Coach " + coachID + " to Department " + departmentKey + ".");
+            System.out.println("Failed to update coach.");
         }
     }
 
@@ -228,6 +218,41 @@ public class DataKafka {
             System.out.println("Could not find coach " + coachID + " .");
         }
         return coach;
+    }
+
+    public static ArrayList<Department> getDepartments() throws Exception{
+        ArrayList<Department> departments = new ArrayList<Department>();
+        String query = "SELECT * FROM department ORDER BY departmentkey";
+        Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_UPDATABLE);
+        ResultSet resultSet = statement.executeQuery(query);
+
+        while (resultSet.next()){
+            Department department = new Department(
+                    resultSet.getString(1),
+                    resultSet.getString(2)
+            );
+            departments.add(department);
+        }
+        resultSet.close();
+        return departments;
+    }
+
+    public static Department findDepartmentByDepartmentKey(String departmentKey) {
+        Department department = null;
+        String query = "SELECT * FROM department WHERE departmentkey = ?";
+        try{
+            PreparedStatement preparedStatement = connection.prepareStatement(query,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            preparedStatement.setString(1, departmentKey);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            resultSet.beforeFirst();
+            while (resultSet.next()){
+                department = new Department(resultSet.getString(1), resultSet.getString(2));
+            }
+            resultSet.close();
+        }catch (Exception e){
+            System.out.println("Could not find department " + departmentKey + " .");
+        }
+        return department;
     }
 
     public static ArrayList<Sport> getSports() throws  Exception{
