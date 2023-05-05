@@ -133,10 +133,6 @@ public class JavaKafkaAdmin {
     }
 
     public static void createCoach() throws Exception {
-        while (true) {
-            sportsList = DataKafka.getSports();
-            departmentsList = DataKafka.getDepartments();
-
         System.out.println("\nCreate Coach ID: ");
         int coachID = Integer.parseInt(bufferedReader.readLine());
         System.out.println("Create Coach's First Name: ");
@@ -156,7 +152,6 @@ public class JavaKafkaAdmin {
             Coach coach = new Coach(coachID, firstName, lastname, sportID, departmentKey);
             DataKafka.createCoach(coach);
         } while (searchBySportId(sportID) && searchByDepartmentKey(departmentKey));
-        }
     }
 
     public static void searchByCoachID(int coachID) throws Exception {
@@ -177,6 +172,48 @@ public class JavaKafkaAdmin {
             }
         } else {
             System.out.println("Application ID not Found.");
+        }
+    }
+
+    public static void sortCoachesByDepartmentKey(String departmentKey) throws Exception {
+        ArrayList<Coach> byDepartmentKey = DataKafka.findCoachesByDepartmentKey(departmentKey);
+        if (!byDepartmentKey.isEmpty()){
+            for (Coach coach : byDepartmentKey) {
+                System.out.printf("%-20s %-20s %-20s %-15s %-15s \n", coach.getCoachID(), coach.getFirstName(), coach.getLastName(), coach.getSportID(), coach.getDepartmentKey());
+            }
+            System.out.println("\nSelect Coach ID: ");
+            int coachID = Integer.parseInt(bufferedReader.readLine());
+
+            for (Coach coach : byDepartmentKey) {
+                if (coachID == coach.getCoachID()) {
+                    searchByCoachID(coachID);
+                    return;
+                }
+            }
+            System.out.println("Invalid Coaches ID.");
+        } else {
+            System.out.println("No coaches found with department key: " + departmentKey);
+        }
+    }
+
+    public static void sortCoachesBySportName(String sportName) throws Exception {
+        ArrayList<Coach> bySportName = DataKafka.findCoachesBySportName(sportName);
+        if (!bySportName.isEmpty()){
+            for (Coach coach : bySportName) {
+                System.out.printf("%-20s %-20s %-20s %-15s %-15s \n", coach.getCoachID(), coach.getFirstName(), coach.getLastName(), coach.getSportID(), coach.getDepartmentKey());
+            }
+            System.out.println("\nSelect Coach ID: ");
+            int coachID = Integer.parseInt(bufferedReader.readLine());
+
+            for (Coach coach : bySportName) {
+                if (coachID == coach.getCoachID()) {
+                    searchByCoachID(coachID);
+                    return;
+                }
+            }
+            System.out.println("Invalid Coach ID.");
+        } else {
+            System.out.println("No coaches found with sport name: " + sportName);
         }
     }
 
@@ -353,13 +390,15 @@ public class JavaKafkaAdmin {
     public static void coachesMenu() throws Exception{
         while (true){
             coachesList = DataKafka.getCoaches();
+            sportsList = DataKafka.getSports();
+            departmentsList = DataKafka.getDepartments();
 
             readAllCoaches();
             System.out.println("\nChoose what to do: ");
             System.out.println("1. Add a Coach");
             System.out.println("2. Select Coach ID");
-            System.out.println("3. View Coaches by Sport");
-            System.out.println("4. View Coaches by Department");
+            System.out.println("3. View Coaches by Department");
+            System.out.println("4. View Coaches by Sport");
             System.out.println("5. Back to Main Menu");
             System.out.print("Choice: ");
             int choice = Integer.parseInt(bufferedReader.readLine());
@@ -374,12 +413,14 @@ public class JavaKafkaAdmin {
                     searchByCoachID(coachID);
                 }
                 case 3 -> {
-                    System.out.println("\nEnter Sport Name: ");
-                    // coaches under a certain sport name will be displayed
+                    System.out.println("\nEnter Department Key: ");
+                    String departmentKey = bufferedReader.readLine();
+                    sortCoachesByDepartmentKey(departmentKey);
                 }
                 case 4 -> {
-                    System.out.println("\nEnter Department Key: ");
-                    // coaches under a certain department key will be displayed
+                    System.out.println("\nEnter Sport Name: ");
+                    String sportName = bufferedReader.readLine();
+                    sortCoachesBySportName(sportName);
                 }
                 case 5 -> {
                     mainMenu();

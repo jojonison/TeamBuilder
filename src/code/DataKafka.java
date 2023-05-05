@@ -81,7 +81,7 @@ public class DataKafka {
                 "FROM application " +
                 "JOIN student ON application.studentid = student.studentid " +
                 "NATURAL JOIN department WHERE department.departmentkey = ? " +
-                "ORDER BY applicationid;";
+                "ORDER BY applicationid";
         try{
             PreparedStatement preparedStatement = connection.prepareStatement(query,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
             preparedStatement.setString(1, departmentKey);
@@ -103,7 +103,7 @@ public class DataKafka {
         String query = "SELECT application.applicationid, application.studentid, application.sportid, application.tryoutid, application.approvalstatus " +
                 "FROM application " +
                 "NATURAL JOIN sport WHERE sport.sportname = ? " +
-                "ORDER BY applicationid;";
+                "ORDER BY applicationid";
         try{
             PreparedStatement preparedStatement = connection.prepareStatement(query,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
             preparedStatement.setString(1, sportName);
@@ -119,7 +119,6 @@ public class DataKafka {
         }
         return applications;
     }
-
 
     public static void updateApplicationStatus(int applicationID, String approvalStatus) {
         String query = "UPDATE application SET approvalstatus=? WHERE applicationid=?";
@@ -152,6 +151,48 @@ public class DataKafka {
             coaches.add(coach);
         }
         resultSet.close();
+        return coaches;
+    }
+
+    public static ArrayList<Coach> findCoachesByDepartmentKey(String departmentKey){
+        ArrayList<Coach> coaches = new ArrayList<>();
+        String query = "SELECT coach.coachid, coach.firstname, coach.lastname, coach.sportid, coach.departmentkey FROM coach " +
+                "NATURAL JOIN department WHERE department.departmentkey = ? " +
+                "ORDER BY coachid";
+        try{
+            PreparedStatement preparedStatement = connection.prepareStatement(query,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            preparedStatement.setString(1, departmentKey);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            resultSet.beforeFirst();
+            while (resultSet.next()){
+                Coach coach = new Coach(resultSet.getInt(1), resultSet.getString(2), resultSet.getString(3), resultSet.getInt(4), resultSet.getString(5));
+                coaches.add(coach);
+            }
+            resultSet.close();
+        }catch (Exception e){
+            System.out.println("Could not find coaches under " + departmentKey + " department.");
+        }
+        return coaches;
+    }
+
+    public static ArrayList<Coach> findCoachesBySportName(String sportName){
+        ArrayList<Coach> coaches = new ArrayList<>();
+        String query = "SELECT coach.coachid, coach.firstname, coach.lastname, coach.sportid, coach.departmentkey FROM coach " +
+                "NATURAL JOIN sport WHERE sport.sportname = ? " +
+                "ORDER BY coachid";
+        try{
+            PreparedStatement preparedStatement = connection.prepareStatement(query,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            preparedStatement.setString(1, sportName);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            resultSet.beforeFirst();
+            while (resultSet.next()){
+                Coach coach = new Coach(resultSet.getInt(1), resultSet.getString(2), resultSet.getString(3), resultSet.getInt(4), resultSet.getString(5));
+                coaches.add(coach);
+            }
+            resultSet.close();
+        }catch (Exception e){
+            System.out.println("Could not find '" + sportName  + "' coaches.");
+        }
         return coaches;
     }
 
