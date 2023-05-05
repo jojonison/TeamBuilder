@@ -81,7 +81,9 @@ public class JavaKafkaStudent {
             if (choice == tryoutDetails.getSportID()){
                 //After the log in is done get the password (which is the student id)
                 //Get the sportsid and tryoutid
-                //Afterwards, create an application object and put it into the database
+                //Afterwards, create an application object
+                //Get the newly created application object and push it into the database
+
             }
             counter++;
         }
