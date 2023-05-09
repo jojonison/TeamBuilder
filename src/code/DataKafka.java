@@ -335,6 +335,92 @@ public class DataKafka {
         return students;
     }
 
+    public static void createStudent(Student student){
+        String query = "INSERT INTO student(studentid,firstname,lastname,emailaddress,departmentkey) VALUES(?,?,?,?,?)";
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(query,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            preparedStatement.setInt(1, student.getStudentID());
+            preparedStatement.setString(2, student.getFirstName());
+            preparedStatement.setString(3, student.getLastName());
+            preparedStatement.setString(4, student.getEmailAddress());
+            preparedStatement.setString(5, student.getDepartmentKey());
+            preparedStatement.execute();
+            System.out.println("Student with the following details is added: \n" + student.toString());
+
+        } catch (SQLException e) {
+            System.out.println("Failed to add student.");
+        }
+    }
+
+    public static void updateStudent(Student student, int studentID){
+        String query = "UPDATE student SET studentid=?, firstname=?, lastname=?, emailaddress=?, departmentkey WHERE studentid=?";
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(query,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            preparedStatement.setInt(1, student.getStudentID());
+            preparedStatement.setString(2, student.getFirstName());
+            preparedStatement.setString(3, student.getLastName());
+            preparedStatement.setString(4, student.getEmailAddress());
+            preparedStatement.setString(5, student.getDepartmentKey());
+            preparedStatement.setInt(5, studentID);
+            preparedStatement.execute();
+            System.out.println("Student " + studentID + " updated.");
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("Failed to update student.");
+        }
+    }
+
+    public static void deleteStudent(int studentID){
+        String query = "DELETE from student where studentid = ?";
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(query,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            preparedStatement.setInt(1, studentID);
+            preparedStatement.execute();
+            System.out.println("Student " + studentID + " removed.");
+        } catch (SQLException e) {
+            System.out.println("Failed to remove student.");
+        }
+    }
+
+    public static Student findStudentByStudentID(int studentID){
+        Student student = null;
+        String query = "SELECT * FROM student WHERE studentid = ?";
+        try{
+            PreparedStatement preparedStatement = connection.prepareStatement(query,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            preparedStatement.setInt(1, studentID);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            resultSet.beforeFirst();
+            while (resultSet.next()){
+                student = new Student(resultSet.getInt(1), resultSet.getString(2), resultSet.getString(3), resultSet.getString(4), resultSet.getString(5));
+            }
+            resultSet.close();
+        }catch (Exception e){
+            System.out.println("Could not find student " + studentID + " .");
+        }
+        return student;
+    }
+
+    public static ArrayList<Student> findStudentsByDepartmentKey(String departmentKey){
+        ArrayList<Student> students = new ArrayList<>();
+        String query = "SELECT student.studentid, student.firstname, student.lastname, student.emailaddress, student.departmentkey FROM student " +
+                "NATURAL JOIN department WHERE department.departmentkey = ? " +
+                "ORDER BY studentid";
+        try{
+            PreparedStatement preparedStatement = connection.prepareStatement(query,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            preparedStatement.setString(1, departmentKey);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            resultSet.beforeFirst();
+            while (resultSet.next()){
+                Student student = new Student(resultSet.getInt(1), resultSet.getString(2), resultSet.getString(3), resultSet.getString(4), resultSet.getString(5));
+                students.add(student);
+            }
+            resultSet.close();
+        }catch (Exception e){
+            System.out.println("Could not find students under " + departmentKey + " department.");
+        }
+        return students;
+    }
+
     public static ArrayList<TryoutDetails> getTryouts() throws  Exception{
         ArrayList<TryoutDetails> tryouts = new ArrayList<TryoutDetails>();
         String query = "SELECT * FROM tryoutdetails ORDER BY tryoutid";

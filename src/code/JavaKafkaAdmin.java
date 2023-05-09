@@ -133,11 +133,11 @@ public class JavaKafkaAdmin {
     }
 
     public static void createCoach() throws Exception {
-        System.out.println("\nCreate Coach ID: ");
+        System.out.println("\nEnter Coach ID: ");
         int coachID = Integer.parseInt(bufferedReader.readLine());
-        System.out.println("Create Coach's First Name: ");
+        System.out.println("Enter Coach's First Name: ");
         String firstName = bufferedReader.readLine();
-        System.out.println("Create Coach's Last Name: ");
+        System.out.println("Enter Coach's Last Name: ");
         String lastname = bufferedReader.readLine();
 
         readAllSports();
@@ -148,10 +148,13 @@ public class JavaKafkaAdmin {
         System.out.println("Assign Coach to a Department Key: ");
         String departmentKey = bufferedReader.readLine();
 
-        do {
+        if (findSportId(sportID) && findDepartmentKey(departmentKey)) {
             Coach coach = new Coach(coachID, firstName, lastname, sportID, departmentKey);
             DataKafka.createCoach(coach);
-        } while (searchBySportId(sportID) && searchByDepartmentKey(departmentKey));
+        } else {
+            System.out.println("Failed to add coach.");
+            coachesMenu();
+        }
     }
 
     public static void searchByCoachID(int coachID) throws Exception {
@@ -171,7 +174,7 @@ public class JavaKafkaAdmin {
                 case 3: mainMenu();
             }
         } else {
-            System.out.println("Application ID not Found.");
+            System.out.println("Sport ID not Found.");
         }
     }
 
@@ -226,31 +229,13 @@ public class JavaKafkaAdmin {
         }
     }
 
-    public static boolean searchByDepartmentKey(String departmentKey) {
+    public static boolean findDepartmentKey(String departmentKey) {
         Department department = DataKafka.findDepartmentByDepartmentKey(departmentKey);
         if (department != null) {
             return true;
         } else {
             System.out.println("Department Key " + departmentKey + " not found.");
             return false;
-        }
-    }
-
-    public static void readAllStudents(){
-        System.out.printf("%-20s %-20s %-20s %-15s %-15s \n", "----------", "----------", "---------", "-------------", "--------------");
-        System.out.printf("%-20s %-20s %-20s %-15s %-15s \n", "Student ID", "First Name", "Last Name", "Email Address", "Department Key");
-        System.out.printf("%-20s %-20s %-20s %-15s %-15s \n", "----------", "----------", "---------", "-------------", "--------------");
-        for (Student student: studentsList){
-            System.out.printf("%-20s %-20s %-20s %-15s %-15s \n", student.getStudentID(), student.getFirstName(), student.getLastName(), student.getEmailAddress(), student.getDepartmentKey());
-        }
-    }
-
-    public static void readAllTryouts(){
-        System.out.printf("%-20s %-20s %-20s %-15s %-15s \n", "---------", "--------", "--------", "--------", "--------");
-        System.out.printf("%-20s %-20s %-20s %-15s %-15s \n", "Tryout ID", "Sport ID", "Schedule", "Location", "Coach ID");
-        System.out.printf("%-20s %-20s %-20s %-15s %-15s \n", "---------", "--------", "--------", "--------", "--------");
-        for (TryoutDetails tryout: tryoutsList){
-            System.out.printf("%-20s %-20s %-20s %-15s %-15s \n", tryout.getTryoutID(), tryout.getSportID(), tryout.getSchedule(), tryout.getLocation(), tryout.getCoachID());
         }
     }
 
@@ -277,47 +262,117 @@ public class JavaKafkaAdmin {
         }
     }
 
-    public static void updateSport(int sportID) throws IOException {
-        Sport sports = DataKafka.findSportBySportID(sportID);
-        if(sports !=null) {
-            System.out.println("Update Sport Name for " + sportID + ": ");
-            String sportName = bufferedReader.readLine();
-            System.out.println("Update Sport Type for " + sportID + ": ");
-            String sportType = bufferedReader.readLine();
-            System.out.println("Update Availability for " + sportID + ": ");
-            String availability = bufferedReader.readLine();
-
-            Sport sport = new Sport(sportID, sportName, sportType, availability);
-            DataKafka.updateSport(sport, sportID);
-        } else {
-            System.out.println("Sport ID not found.");
-        }
-    }
-
-    public static void deleteSport(int sportID) throws IOException {
-        Sport sport = DataKafka.findSportBySportID(sportID);
-        if(sport !=null){
-            System.out.printf("%-20s %-20s %-20s %-15s \n", "Sport details: ", sport.getSportName(), sport.getSportType(), sport.getAvailability());
-
-            System.out.println();
-            System.out.println("Delete this sport? (y/n): ");
-            String delete = bufferedReader.readLine();
-
-            if (delete.equalsIgnoreCase("y")){
-                DataKafka.deleteSport(sportID);
-            }
-        }else {
-            System.out.println("Sport ID not found.");
-        }
-    }
-
-    public static boolean searchBySportId(int sportID) {
+    public static boolean findSportId(int sportID) {
         Sport sport = DataKafka.findSportBySportID(sportID);
         if (sport != null) {
             return true;
         } else {
             System.out.println("Sport ID " + sportID + " not found.");
             return false;
+        }
+    }
+
+    public static void searchBySportId(int sportID) throws Exception {
+        Sport sport = DataKafka.findSportBySportID(sportID);
+        if (sport != null){
+            System.out.printf("%-20s %-20s %-20s %-15s \n", "Sport details: ", sport.getSportName(), sport.getSportType(), sport.getAvailability());
+            System.out.println("\nChoose what to do: ");
+            System.out.println("1. Edit Sport Details");
+            System.out.println("2. Delete Sport");
+            System.out.println("3. Back to Main Menu");
+            System.out.print("Choice: ");
+            int choice = Integer.parseInt(bufferedReader.readLine());
+
+            switch (choice) {
+                case 1: DataKafka.updateSport(sport, sportID);
+                case 2: DataKafka.deleteSport(sportID);
+                case 3: mainMenu();
+            }
+        } else {
+            System.out.println("Sport ID not Found.");
+        }
+    }
+
+    public static void createStudent() throws Exception{
+        System.out.println("Enter Student ID: ");
+        int studentID = Integer.parseInt(bufferedReader.readLine());
+        System.out.println("Enter Student's First Name: ");
+        String firstName = bufferedReader.readLine();
+        System.out.println("Enter Student's Last Name: ");
+        String lastName = bufferedReader.readLine();
+        System.out.println("Enter Student's Email Address: ");
+        String emailAdd = bufferedReader.readLine();
+
+        readAllDepartments();
+        System.out.println("Assign Student to Department Key: ");
+        String departmentKey = bufferedReader.readLine();
+
+        if (findDepartmentKey(departmentKey)) {
+            Student student = new Student(studentID, firstName, lastName, emailAdd, departmentKey);
+            DataKafka.createStudent(student);
+        } else {
+            System.out.println("Failed to add student.");
+            studentsMenu();
+        }
+    }
+
+    public static void readAllStudents(){
+        System.out.printf("%-20s %-20s %-20s %-15s %-15s \n", "----------", "----------", "---------", "-------------", "--------------");
+        System.out.printf("%-20s %-20s %-20s %-15s %-15s \n", "Student ID", "First Name", "Last Name", "Email Address", "Department Key");
+        System.out.printf("%-20s %-20s %-20s %-15s %-15s \n", "----------", "----------", "---------", "-------------", "--------------");
+        for (Student student: studentsList){
+            System.out.printf("%-20s %-20s %-20s %-15s %-15s \n", student.getStudentID(), student.getFirstName(), student.getLastName(), student.getEmailAddress(), student.getDepartmentKey());
+        }
+    }
+
+    public static void searchByStudentId(int studentID) throws Exception {
+        Student student = DataKafka.findStudentByStudentID(studentID);
+        if (student != null){
+            System.out.printf("%-20s %-20s %-20s %-15s %-15s \n", student.getStudentID(), student.getFirstName(), student.getLastName(), student.getEmailAddress(), student.getDepartmentKey());
+            System.out.println("\nChoose what to do: ");
+            System.out.println("1. Edit Student Details");
+            System.out.println("2. Remove Student");
+            System.out.println("3. Back to Main Menu");
+            System.out.print("Choice: ");
+            int choice = Integer.parseInt(bufferedReader.readLine());
+
+            switch (choice) {
+                case 1: DataKafka.updateStudent(student, studentID);
+                case 2: DataKafka.deleteStudent(studentID);
+                case 3: mainMenu();
+            }
+        } else {
+            System.out.println("Sport ID not Found.");
+        }
+    }
+
+    public static void sortStudentsByDepartmentKey(String departmentKey) throws Exception {
+        ArrayList<Student> byDepartmentKey = DataKafka.findStudentsByDepartmentKey(departmentKey);
+        if (!byDepartmentKey.isEmpty()){
+            for (Student student : byDepartmentKey) {
+                System.out.printf("%-20s %-20s %-20s %-15s %-15s \n", student.getStudentID(), student.getFirstName(), student.getLastName(), student.getEmailAddress(), student.getDepartmentKey());
+            }
+            System.out.println("\nSelect Student ID: ");
+            int studentID = Integer.parseInt(bufferedReader.readLine());
+
+            for (Student student : byDepartmentKey) {
+                if (studentID == student.getStudentID()) {
+                    searchByStudentId(studentID);
+                    return;
+                }
+            }
+            System.out.println("Invalid Student ID.");
+        } else {
+            System.out.println("No students found with department key: " + departmentKey);
+        }
+    }
+
+    public static void readAllTryouts(){
+        System.out.printf("%-20s %-20s %-20s %-15s %-15s \n", "---------", "--------", "--------", "--------", "--------");
+        System.out.printf("%-20s %-20s %-20s %-15s %-15s \n", "Tryout ID", "Sport ID", "Schedule", "Location", "Coach ID");
+        System.out.printf("%-20s %-20s %-20s %-15s %-15s \n", "---------", "--------", "--------", "--------", "--------");
+        for (TryoutDetails tryout: tryoutsList){
+            System.out.printf("%-20s %-20s %-20s %-15s %-15s \n", tryout.getTryoutID(), tryout.getSportID(), tryout.getSchedule(), tryout.getLocation(), tryout.getCoachID());
         }
     }
 
@@ -450,7 +505,8 @@ public class JavaKafkaAdmin {
                 }
                 case 2 -> {
                     System.out.println("\nEnter Sport ID:");
-                    // after selecting a sport, admin can edit or remove the sport
+                    int sportID = Integer.parseInt(bufferedReader.readLine());
+                    searchBySportId(sportID);
                 }
                 case 3 -> {
                     mainMenu();
@@ -464,6 +520,7 @@ public class JavaKafkaAdmin {
     public static void studentsMenu() throws Exception {
         while (true) {
             studentsList = DataKafka.getStudents();
+            departmentsList = DataKafka.getDepartments();
 
             readAllStudents();
             System.out.println("\nChoose what to do: ");
@@ -476,15 +533,17 @@ public class JavaKafkaAdmin {
 
             switch (choice) {
                 case 1 -> {
-                    // call method for creating a new student account
+                    createStudent();
                 }
                 case 2 -> {
                     System.out.println("\nEnter Student ID: ");
-                    // after selecting a student, admin can edit or remove the student
+                    int studentID = Integer.parseInt(bufferedReader.readLine());
+                    searchByStudentId(studentID);
                 }
                 case 3 -> {
                     System.out.println("\nEnter Department Key: ");
-                    // students under a certain department key will be displayed
+                    String departmentKey = bufferedReader.readLine();
+                    sortStudentsByDepartmentKey(departmentKey);
                 }
                 case 4 -> {
                     mainMenu();
