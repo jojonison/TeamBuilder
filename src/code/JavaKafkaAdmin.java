@@ -56,7 +56,7 @@ public class JavaKafkaAdmin {
                 }
             }
         } else {
-            System.out.println("Application ID not Found.");
+            System.out.println("Invalid input.");
         }
     }
 
@@ -75,9 +75,9 @@ public class JavaKafkaAdmin {
                     return;
                 }
             }
-            System.out.println("Invalid Application ID.");
+            System.out.println("Invalid input.");
         } else {
-            System.out.println("No applications found with approval status: " + approvalStatus);
+            System.out.println("Invalid input.");
         }
     }
 
@@ -96,9 +96,9 @@ public class JavaKafkaAdmin {
                     return;
                 }
             }
-            System.out.println("Invalid Application ID.");
+            System.out.println("Invalid input.");
         } else {
-            System.out.println("No applications found with department key: " + departmentKey);
+            System.out.println("Invalid input.");
         }
     }
 
@@ -117,9 +117,9 @@ public class JavaKafkaAdmin {
                     return;
                 }
             }
-            System.out.println("Invalid Application ID.");
+            System.out.println("Invalid input.");
         } else {
-            System.out.println("No applications found with sport name: " + sportName);
+            System.out.println("Invalid input.");
         }
     }
 
@@ -152,7 +152,7 @@ public class JavaKafkaAdmin {
             Coach coach = new Coach(coachID, firstName, lastname, sportID, departmentKey);
             DataKafka.createCoach(coach);
         } else {
-            System.out.println("Failed to add coach.");
+            System.out.println("Invalid input.");
             coachesMenu();
         }
     }
@@ -174,7 +174,7 @@ public class JavaKafkaAdmin {
                 case 3: mainMenu();
             }
         } else {
-            System.out.println("Sport ID not Found.");
+            System.out.println("Invalid input.");
         }
     }
 
@@ -193,9 +193,9 @@ public class JavaKafkaAdmin {
                     return;
                 }
             }
-            System.out.println("Invalid Coaches ID.");
+            System.out.println("Invalid input.");
         } else {
-            System.out.println("No coaches found with department key: " + departmentKey);
+            System.out.println("Invalid input.");
         }
     }
 
@@ -214,9 +214,9 @@ public class JavaKafkaAdmin {
                     return;
                 }
             }
-            System.out.println("Invalid Coach ID.");
+            System.out.println("Invalid input.");
         } else {
-            System.out.println("No coaches found with sport name: " + sportName);
+            System.out.println("Invalid input.");
         }
     }
 
@@ -231,12 +231,7 @@ public class JavaKafkaAdmin {
 
     public static boolean findDepartmentKey(String departmentKey) {
         Department department = DataKafka.findDepartmentByDepartmentKey(departmentKey);
-        if (department != null) {
-            return true;
-        } else {
-            System.out.println("Department Key " + departmentKey + " not found.");
-            return false;
-        }
+        return department != null;
     }
 
     public static void createSport() throws Exception{
@@ -264,12 +259,7 @@ public class JavaKafkaAdmin {
 
     public static boolean findSportId(int sportID) {
         Sport sport = DataKafka.findSportBySportID(sportID);
-        if (sport != null) {
-            return true;
-        } else {
-            System.out.println("Sport ID " + sportID + " not found.");
-            return false;
-        }
+        return sport != null;
     }
 
     public static void searchBySportId(int sportID) throws Exception {
@@ -289,7 +279,7 @@ public class JavaKafkaAdmin {
                 case 3: mainMenu();
             }
         } else {
-            System.out.println("Sport ID not Found.");
+            System.out.println("Invalid input.");
         }
     }
 
@@ -311,7 +301,7 @@ public class JavaKafkaAdmin {
             Student student = new Student(studentID, firstName, lastName, emailAdd, departmentKey);
             DataKafka.createStudent(student);
         } else {
-            System.out.println("Failed to add student.");
+            System.out.println("Invalid input.");
             studentsMenu();
         }
     }
@@ -342,7 +332,7 @@ public class JavaKafkaAdmin {
                 case 3: mainMenu();
             }
         } else {
-            System.out.println("Sport ID not Found.");
+            System.out.println("Invalid input.");
         }
     }
 
@@ -361,9 +351,9 @@ public class JavaKafkaAdmin {
                     return;
                 }
             }
-            System.out.println("Invalid Student ID.");
+            System.out.println("Invalid input.");
         } else {
-            System.out.println("No students found with department key: " + departmentKey);
+            System.out.println("Invalid input.");
         }
     }
 
@@ -373,6 +363,109 @@ public class JavaKafkaAdmin {
         System.out.printf("%-20s %-20s %-20s %-15s %-15s \n", "---------", "--------", "--------", "--------", "--------");
         for (TryoutDetails tryout: tryoutsList){
             System.out.printf("%-20s %-20s %-20s %-15s %-15s \n", tryout.getTryoutID(), tryout.getSportID(), tryout.getSchedule(), tryout.getLocation(), tryout.getCoachID());
+        }
+    }
+
+    public static void searchByTryoutID(int tryoutID) throws Exception {
+        TryoutDetails tryout = DataKafka.findTryoutByTryoutID(tryoutID);
+        if (tryout != null){
+            System.out.printf("%-20s %-20s %-20s %-15s %-15s \n", tryout.getTryoutID(), tryout.getSportID(), tryout.getSchedule(), tryout.getLocation(), tryout.getCoachID());
+            System.out.println("\nChoose what to do: ");
+            System.out.println("1. Edit Tryout Details");
+            System.out.println("2. Delete Tryout Details");
+            System.out.println("3. Back to Main Menu");
+            System.out.print("Choice: ");
+            int choice = Integer.parseInt(bufferedReader.readLine());
+
+            switch (choice) {
+                case 1: DataKafka.updateTryouts(tryout, tryoutID);
+                case 2: DataKafka.deleteTryouts(tryoutID);
+                case 3: mainMenu();
+            }
+        } else {
+            System.out.println("Invalid input.");
+        }
+    }
+
+    public static void sortTryoutsByCoachName(String firstname, String lastname) throws Exception {
+        if (firstname.isEmpty()) {
+            ArrayList<TryoutDetails> byLastName = DataKafka.findTryoutsByCoachLastName(lastname);
+            if (!byLastName.isEmpty()){
+                for (TryoutDetails tryout: byLastName) {
+                    System.out.printf("%-20s %-20s %-20s %-15s %-15s \n", tryout.getTryoutID(), tryout.getSportID(), tryout.getSchedule(), tryout.getLocation(), tryout.getCoachID());
+                }
+                System.out.println("\nSelect Tryout ID: ");
+                int tryoutID = Integer.parseInt(bufferedReader.readLine());
+
+                for (TryoutDetails tryoutDetails : byLastName) {
+                    if (tryoutID == tryoutDetails.getTryoutID()) {
+                        searchByTryoutID(tryoutID);
+                        return;
+                    }
+                }
+                System.out.println("Invalid input.");
+            } else {
+                System.out.println("Invalid input.");
+            }
+        } else if (lastname.isEmpty()) {
+            ArrayList<TryoutDetails> byFirstName = DataKafka.findTryoutsByCoachFirstName(firstname);
+            if (!byFirstName.isEmpty()){
+                for (TryoutDetails tryout: byFirstName) {
+                    System.out.printf("%-20s %-20s %-20s %-15s %-15s \n", tryout.getTryoutID(), tryout.getSportID(), tryout.getSchedule(), tryout.getLocation(), tryout.getCoachID());
+                }
+                System.out.println("\nSelect Tryout ID: ");
+                int tryoutID = Integer.parseInt(bufferedReader.readLine());
+
+                for (TryoutDetails tryoutDetails : byFirstName) {
+                    if (tryoutID == tryoutDetails.getTryoutID()) {
+                        searchByTryoutID(tryoutID);
+                        return;
+                    }
+                }
+                System.out.println("Invalid input.");
+            } else {
+                System.out.println("Invalid input.");
+            }
+        } else {
+            ArrayList<TryoutDetails> byFullName = DataKafka.findTryoutsByCoachFullName(firstname, lastname);
+            if (!byFullName.isEmpty()){
+                for (TryoutDetails tryout: byFullName) {
+                    System.out.printf("%-20s %-20s %-20s %-15s %-15s \n", tryout.getTryoutID(), tryout.getSportID(), tryout.getSchedule(), tryout.getLocation(), tryout.getCoachID());
+                }
+                System.out.println("\nSelect Tryout ID: ");
+                int tryoutID = Integer.parseInt(bufferedReader.readLine());
+
+                for (TryoutDetails tryoutDetails : byFullName) {
+                    if (tryoutID == tryoutDetails.getTryoutID()) {
+                        searchByTryoutID(tryoutID);
+                        return;
+                    }
+                }
+                System.out.println("Invalid input.");
+            } else {
+                System.out.println("Invalid input.");
+            }
+        }
+    }
+
+    public static void sortTryoutsBySportName(String sportName) throws Exception {
+        ArrayList<TryoutDetails> bySportName = DataKafka.findTryoutsBySportName(sportName);
+        if (!bySportName.isEmpty()){
+            for (TryoutDetails tryout : bySportName) {
+                System.out.printf("%-20s %-20s %-20s %-15s %-15s \n", tryout.getTryoutID(), tryout.getSportID(), tryout.getSchedule(), tryout.getLocation(), tryout.getCoachID());
+            }
+            System.out.println("\nSelect Tryout ID: ");
+            int tryoutID = Integer.parseInt(bufferedReader.readLine());
+
+            for (TryoutDetails tryoutDetails : bySportName) {
+                if (tryoutID == tryoutDetails.getTryoutID()) {
+                    searchByTryoutID(tryoutID);
+                    return;
+                }
+            }
+            System.out.println("Invalid input.");
+        } else {
+            System.out.println("Invalid input.");
         }
     }
 
@@ -394,7 +487,7 @@ public class JavaKafkaAdmin {
             case 4 : studentsMenu();
             case 5 : tryoutsMenu();
             case 6 : DataKafka.closeConnection();
-            default : System.out.println("Invalid Input.");
+            default : System.out.println("Invalid input.");
         }
     }
 
@@ -437,7 +530,7 @@ public class JavaKafkaAdmin {
                     mainMenu();
                     System.out.println();
                 }
-                default -> System.out.println("Invalid Input.");
+                default -> System.out.println("Invalid input.");
             }
         }
     }
@@ -481,7 +574,7 @@ public class JavaKafkaAdmin {
                     mainMenu();
                     System.out.println();
                 }
-                default -> System.out.println("Invalid Input.");
+                default -> System.out.println("Invalid input.");
             }
         }
     }
@@ -512,7 +605,7 @@ public class JavaKafkaAdmin {
                     mainMenu();
                     System.out.println();
                 }
-                default -> System.out.println("Invalid Input.");
+                default -> System.out.println("Invalid input.");
             }
         }
     }
@@ -549,7 +642,7 @@ public class JavaKafkaAdmin {
                     mainMenu();
                     System.out.println();
                 }
-                default -> System.out.println("Invalid Input.");
+                default -> System.out.println("Invalid input.");
             }
         }
     }
@@ -570,15 +663,20 @@ public class JavaKafkaAdmin {
                 case 1 -> {
                     readAllTryouts();
                     System.out.println("Select Tryout ID: ");
-                    // after selecting a tryout, admin can edit or remove the tryout
+                    int tryoutID = Integer.parseInt(bufferedReader.readLine());
+                    searchByTryoutID(tryoutID);
                 }
                 case 2 -> {
-                    System.out.println("Enter Coach Name: ");
-                    // tryouts under a certain coach name will be displayed
+                    System.out.println("Enter Coach's First Name: ");
+                    String firstname = bufferedReader.readLine();
+                    System.out.println("Enter Coach's Last Name: ");
+                    String lastname = bufferedReader.readLine();
+                    sortTryoutsByCoachName(firstname, lastname);
                 }
                 case 3 -> {
                     System.out.println("Enter Sport Name: ");
-                    // tryouts under a certain sport name will be displayed
+                    String sportName = bufferedReader.readLine();
+                    sortTryoutsBySportName(sportName);
                 }
                 case 4 -> {
                     mainMenu();

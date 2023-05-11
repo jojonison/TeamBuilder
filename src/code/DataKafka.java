@@ -52,7 +52,7 @@ public class DataKafka {
             }
             resultSet.close();
         }catch (Exception e){
-            System.out.println("Could not find application " + applicationID + " .");
+            System.out.println("Could not find application " + applicationID + ".");
         }
         return application;
     }
@@ -130,7 +130,7 @@ public class DataKafka {
             System.out.println("Application now " + approvalStatus + ".");
         } catch (SQLException e) {
             e.printStackTrace();
-            System.out.println("Failed to update application.");
+            System.out.println("Failed to update application " + applicationID + ".");
         }
     }
 
@@ -206,10 +206,10 @@ public class DataKafka {
             preparedStatement.setInt(4, coach.getSportID());
             preparedStatement.setString(5, coach.getDepartmentKey());
             preparedStatement.execute();
-            System.out.println("Coach with the following details is added: \n" + coach.toString());
+            System.out.println("Coach with the following details is added: \n" + coach);
 
         } catch (SQLException e) {
-            System.out.println("Failed to add coach.");
+            System.out.println("Failed to add coach " + coach.getCoachID() + ".");
         }
     }
 
@@ -227,7 +227,7 @@ public class DataKafka {
             System.out.println("Coach " + coachID + " updated.");
         } catch (SQLException e) {
             e.printStackTrace();
-            System.out.println("Failed to update coach.");
+            System.out.println("Failed to update coach" + coachID + ".");
         }
     }
 
@@ -239,7 +239,7 @@ public class DataKafka {
             preparedStatement.execute();
             System.out.println("Coach " + coachID + " removed.");
         } catch (SQLException e) {
-            System.out.println("Failed to remove coach.");
+            System.out.println("Failed to remove coach " + coachID + ".");
         }
     }
 
@@ -256,7 +256,7 @@ public class DataKafka {
             }
             resultSet.close();
         }catch (Exception e){
-            System.out.println("Could not find coach " + coachID + " .");
+            System.out.println("Could not find coach " + coachID + ".");
         }
         return coach;
     }
@@ -291,7 +291,7 @@ public class DataKafka {
             }
             resultSet.close();
         }catch (Exception e){
-            System.out.println("Could not find department " + departmentKey + " .");
+            System.out.println("Could not find department " + departmentKey + ".");
         }
         return department;
     }
@@ -313,6 +313,69 @@ public class DataKafka {
         }
         resultSet.close();
         return sports;
+    }
+
+    public static void createSport(Sport sport){
+        String query = "INSERT INTO sport(sportid,sportname,sporttype,availability) VALUES(?,?,?,?)";
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(query,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            preparedStatement.setInt(1, sport.getSportID());
+            preparedStatement.setString(2, sport.getSportName());
+            preparedStatement.setString(3, sport.getSportType());
+            preparedStatement.setString(4, sport.getAvailability());
+            preparedStatement.execute();
+            System.out.println("Sport with the following details is added: \n" + sport);
+
+        } catch (SQLException e) {
+            System.out.println("Failed to add sport " + sport.getSportID() + ".");
+        }
+    }
+
+    public static void updateSport(Sport sport, int sportID){
+        String query = "UPDATE sport SET sportid=?, sportname=?, sporttype=?, availability=? WHERE sportid=?";
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(query,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            preparedStatement.setInt(1, sport.getSportID());
+            preparedStatement.setString(2, sport.getSportName());
+            preparedStatement.setString(3, sport.getSportType());
+            preparedStatement.setString(4, sport.getAvailability());
+            preparedStatement.setInt(5,sportID);
+            preparedStatement.execute();
+            System.out.println("Sport " + sportID + " updated.");
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("Failed to update sport " + sportID + ".");
+        }
+    }
+
+    public static void deleteSport(int sportID){
+        String query = "DELETE from sport where sportid = ?";
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(query,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            preparedStatement.setInt(1, sportID);
+            preparedStatement.execute();
+            System.out.println("Sport " + sportID + " deleted.");
+        } catch (SQLException e) {
+            System.out.println("Failed to delete sport " + sportID + ".");
+        }
+    }
+
+    public static Sport findSportBySportID(int sportID){
+        Sport sport = null;
+        String query = "SELECT * FROM sport WHERE sportid = ?";
+        try{
+            PreparedStatement preparedStatement = connection.prepareStatement(query,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            preparedStatement.setInt(1, sportID);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            resultSet.beforeFirst();
+            while (resultSet.next()){
+                sport = new Sport(resultSet.getInt(1),resultSet.getString(2),resultSet.getString(3),resultSet.getString(4));
+            }
+            resultSet.close();
+        }catch (Exception e){
+            System.out.println("Could not find sport " + sportID + ".");
+        }
+        return sport;
     }
 
     public static ArrayList<Student> getStudents() throws  Exception{
@@ -345,15 +408,15 @@ public class DataKafka {
             preparedStatement.setString(4, student.getEmailAddress());
             preparedStatement.setString(5, student.getDepartmentKey());
             preparedStatement.execute();
-            System.out.println("Student with the following details is added: \n" + student.toString());
+            System.out.println("Student with the following details is added: \n" + student);
 
         } catch (SQLException e) {
-            System.out.println("Failed to add student.");
+            System.out.println("Failed to add student " + student.getStudentID() + ".");
         }
     }
 
     public static void updateStudent(Student student, int studentID){
-        String query = "UPDATE student SET studentid=?, firstname=?, lastname=?, emailaddress=?, departmentkey WHERE studentid=?";
+        String query = "UPDATE student SET studentid=?, firstname=?, lastname=?, emailaddress=?, departmentkey=? WHERE studentid=?";
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(query,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
             preparedStatement.setInt(1, student.getStudentID());
@@ -366,7 +429,7 @@ public class DataKafka {
             System.out.println("Student " + studentID + " updated.");
         } catch (SQLException e) {
             e.printStackTrace();
-            System.out.println("Failed to update student.");
+            System.out.println("Failed to update student " + studentID + ".");
         }
     }
 
@@ -378,7 +441,7 @@ public class DataKafka {
             preparedStatement.execute();
             System.out.println("Student " + studentID + " removed.");
         } catch (SQLException e) {
-            System.out.println("Failed to remove student.");
+            System.out.println("Failed to remove student " + studentID + ".");
         }
     }
 
@@ -441,69 +504,138 @@ public class DataKafka {
         return tryouts;
     }
 
-    public static void createSport(Sport sport){
-        String query = "INSERT INTO sport(sportid,sportname,sporttype,availability) VALUES(?,?,?,?)";
+    public static void updateTryouts(TryoutDetails tryouts, int tryoutID){
+        String query = "UPDATE tryoutdetails SET tryoutid=?, sportid=?, schedule=?, location=?, coachid=? WHERE tryoutid=?";
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(query,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            preparedStatement.setInt(1, sport.getSportID());
-            preparedStatement.setString(2, sport.getSportName());
-            preparedStatement.setString(3, sport.getSportType());
-            preparedStatement.setString(4, sport.getAvailability());
+            preparedStatement.setInt(1, tryouts.getTryoutID());
+            preparedStatement.setInt(2, tryouts.getSportID());
+            preparedStatement.setString(3, tryouts.getSchedule());
+            preparedStatement.setString(4, tryouts.getLocation());
+            preparedStatement.setInt(5, tryouts.getCoachID());
+            preparedStatement.setInt(5, tryoutID);
             preparedStatement.execute();
-            System.out.println("Sport with the following details is added: \n" + sport.toString());
-
-        } catch (SQLException e) {
-            System.out.println("Failed to add sport.");
-        }
-    }
-
-    public static void updateSport(Sport sport, int sportID){
-        String query = "UPDATE sport SET sportid=?, sportname=?, sporttype=?, availability=? WHERE sportid=?";
-        try {
-            PreparedStatement preparedStatement = connection.prepareStatement(query,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            preparedStatement.setInt(1, sport.getSportID());
-            preparedStatement.setString(2, sport.getSportName());
-            preparedStatement.setString(3, sport.getSportType());
-            preparedStatement.setString(4, sport.getAvailability());
-            preparedStatement.setInt(5,sportID);
-            preparedStatement.execute();
-            System.out.println("Sport " + sportID + " updated.");
+            System.out.println("Tryout " + tryoutID + " updated.");
         } catch (SQLException e) {
             e.printStackTrace();
-            System.out.println("Failed to update sport.");
+            System.out.println("Failed to update tryout " + tryoutID + ".");
         }
     }
 
-    public static void deleteSport(int sportID){
-        String query = "DELETE from sport where sportid = ?";
+    public static void deleteTryouts(int tryoutID){
+        String query = "DELETE from tryoutdetails where tryoutid = ?";
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(query,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            preparedStatement.setInt(1, sportID);
+            preparedStatement.setInt(1, tryoutID);
             preparedStatement.execute();
-            System.out.println("Sport " + sportID + " deleted.");
+            System.out.println("Tryout " + tryoutID + " removed.");
         } catch (SQLException e) {
-            System.out.println("Failed to delete sport.");
+            System.out.println("Failed to remove tryout " + tryoutID + ".");
         }
     }
 
-    public static Sport findSportBySportID(int sportID){
-        Sport sport = null;
-        String query = "SELECT * FROM sport WHERE sportid = ?";
+    public static TryoutDetails findTryoutByTryoutID(int tryoutID){
+        TryoutDetails tryoutDetail = null;
+        String query = "SELECT * FROM tryoutdetails WHERE tryoutid = ?";
         try{
             PreparedStatement preparedStatement = connection.prepareStatement(query,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            preparedStatement.setInt(1, sportID);
+            preparedStatement.setInt(1, tryoutID);
             ResultSet resultSet = preparedStatement.executeQuery();
             resultSet.beforeFirst();
             while (resultSet.next()){
-                sport = new Sport(resultSet.getInt(1),resultSet.getString(2),resultSet.getString(3),resultSet.getString(4));
+                tryoutDetail = new TryoutDetails(resultSet.getInt(1), resultSet.getInt(2), resultSet.getString(3), resultSet.getString(4), resultSet.getInt(5));
             }
             resultSet.close();
         }catch (Exception e){
-            System.out.println("Could not find sport " + sportID + " .");
+            System.out.println("Could not find tryout " + tryoutID + ".");
         }
-        return sport;
+        return tryoutDetail;
     }
 
+    public static ArrayList<TryoutDetails> findTryoutsByCoachFullName(String firstname, String lastname){
+        ArrayList<TryoutDetails> tryouts = new ArrayList<>();
+        String query = "SELECT tryoutdetails.tryoutid, tryoutdetails.sportid, tryoutdetails.schedule, tryoutdetails.location FROM tryoutdetails " +
+                "NATURAL JOIN coach WHERE coach.firstname = ? AND coach.lastname = ? " +
+                "ORDER BY tryoutid";
+        try{
+            PreparedStatement preparedStatement = connection.prepareStatement(query,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            preparedStatement.setString(1, firstname);
+            preparedStatement.setString(2, lastname);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            resultSet.beforeFirst();
+            while (resultSet.next()){
+                TryoutDetails tryoutDetail = new TryoutDetails(resultSet.getInt(1), resultSet.getInt(2), resultSet.getString(3), resultSet.getString(4), resultSet.getInt(5));
+                tryouts.add(tryoutDetail);
+            }
+            resultSet.close();
+        }catch (Exception e){
+            System.out.println("Could not find tryouts under coach " + firstname + " " + lastname + ".");
+        }
+        return tryouts;
+    }
+
+    public static ArrayList<TryoutDetails> findTryoutsByCoachFirstName(String firstname){
+        ArrayList<TryoutDetails> tryouts = new ArrayList<>();
+        String query = "SELECT tryoutdetails.tryoutid, tryoutdetails.sportid, tryoutdetails.schedule, tryoutdetails.location FROM tryoutdetails " +
+                "NATURAL JOIN coach WHERE coach.firstname = ? " +
+                "ORDER BY tryoutid";
+        try{
+            PreparedStatement preparedStatement = connection.prepareStatement(query,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            preparedStatement.setString(1, firstname);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            resultSet.beforeFirst();
+            while (resultSet.next()){
+                TryoutDetails tryoutDetail = new TryoutDetails(resultSet.getInt(1), resultSet.getInt(2), resultSet.getString(3), resultSet.getString(4), resultSet.getInt(5));
+                tryouts.add(tryoutDetail);
+            }
+            resultSet.close();
+        }catch (Exception e){
+            System.out.println("Could not find tryouts under coach " + firstname + ".");
+        }
+        return tryouts;
+    }
+
+    public static ArrayList<TryoutDetails> findTryoutsByCoachLastName(String lastname){
+        ArrayList<TryoutDetails> tryouts = new ArrayList<>();
+        String query = "SELECT tryoutdetails.tryoutid, tryoutdetails.sportid, tryoutdetails.schedule, tryoutdetails.location FROM tryoutdetails " +
+                "NATURAL JOIN coach WHERE coach.lastname = ? " +
+                "ORDER BY tryoutid";
+        try{
+            PreparedStatement preparedStatement = connection.prepareStatement(query,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            preparedStatement.setString(1, lastname);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            resultSet.beforeFirst();
+            while (resultSet.next()){
+                TryoutDetails tryoutDetail = new TryoutDetails(resultSet.getInt(1), resultSet.getInt(2), resultSet.getString(3), resultSet.getString(4), resultSet.getInt(5));
+                tryouts.add(tryoutDetail);
+            }
+            resultSet.close();
+        }catch (Exception e){
+            System.out.println("Could not find tryouts under coach " + lastname + ".");
+        }
+        return tryouts;
+    }
+
+    public static ArrayList<TryoutDetails> findTryoutsBySportName(String sportName){
+        ArrayList<TryoutDetails> tryouts = new ArrayList<>();
+        String query = "SELECT tryoutdetails.tryoutid, tryoutdetails.sportid, tryoutdetails.schedule, tryoutdetails.location, tryoutdetails.coachid FROM tryoutdetails " +
+                "NATURAL JOIN sport WHERE sport.sportname = ? " +
+                "ORDER BY tryoutid";
+        try{
+            PreparedStatement preparedStatement = connection.prepareStatement(query,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            preparedStatement.setString(1, sportName);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            resultSet.beforeFirst();
+            while (resultSet.next()){
+                TryoutDetails tryoutDetail = new TryoutDetails(resultSet.getInt(1), resultSet.getInt(2), resultSet.getString(3), resultSet.getString(4), resultSet.getInt(5));
+                tryouts.add(tryoutDetail);
+            }
+            resultSet.close();
+        }catch (Exception e){
+            System.out.println("Could not find tryouts under " + sportName + ".");
+        }
+        return tryouts;
+    }
     public static void closeConnection() throws Exception{
         if(connection != null){
             connection.close();
