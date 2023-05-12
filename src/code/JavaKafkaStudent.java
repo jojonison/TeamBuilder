@@ -20,53 +20,57 @@ public class JavaKafkaStudent {
     public static ArrayList<Application> applicationsList;
 
     public static ArrayList<Student> studentsList;
+
+    public static int studentID;
     public static void main(String[] args) throws Exception {
         DataKafka.setConnection();
         JavaKafkaStudent student = new JavaKafkaStudent();
-        student.showMenu();
+        student.logIn();
     }
 
-    public void showMenu() throws Exception{
+    public void logIn() throws Exception {
         while (true) {
-            System.out.println("Select the number of what you want to do: ");
+            studentsList = DataKafka.getStudents();
+
+            System.out.println("Email Address: ");
+            String emailAddress = bufferedReader.readLine();
+            System.out.println("Password: ");
+            studentID = Integer.parseInt(bufferedReader.readLine());
+
+            mainMenu();
+        }
+    }
+
+    public void mainMenu() throws Exception{
+        while (true) {
+            applicationsList = DataKafka.getOwnApplications(studentID);
+            sportsList = DataKafka.getAvailableSports();
+
+            System.out.println("Choose what to do: ");
             System.out.println("1. Show Available Sports");
-            System.out.println("2. Apply Available Sports");
-            System.out.println("3. View My Applications");
-            System.out.println("4. Exit");
+            System.out.println("2. View My Applications");
+            System.out.println("3. Exit");
             int choice = Integer.parseInt(bufferedReader.readLine());
 
             switch (choice) {
-                case 1:
-                    showAvailableSports();
-                    break;
-                case 2:
-                    applyAvailableSports();
-                    break;
-                case 3:
-                    viewApplication();
-                    break;
-                case 4:
-                    System.exit(0);
-                default:
-                    System.out.println("Wrong input, system will no exit");
-                    System.exit(0);
+                case 1: showAvailableSports();
+                case 2: viewApplication();
+                case 3: System.exit(0);
+                default: System.out.println("Invalid input.");
             }
         }
     }
 
     public void showAvailableSports() throws Exception {
-
-            sportsList = DataKafka.getSports();
-            int count = 1;
-            System.out.printf("%-20s %-20s %-20s \n","" ,"--------" , "--------------");
-            System.out.printf("%-20s %-20s %-20s \n","" ,"Coach ID" , "Availability");
-            System.out.printf("%-20s %-20s %-20s \n","" , "--------" , "--------------");
-            for (Sport sport : sportsList){
-                System.out.printf("%-20s %-20s %-20s\n",count+".", sport.getSportName(), sport.getAvailability());
-                count++;
-            }
-            System.out.println();
+        System.out.printf("%-20s %-20s %-20s %-15s \n", "--------", "----------", "----------", "------------");
+        System.out.printf("%-20s %-20s %-20s %-15s \n", "Sport ID", "Sport Name", "Sport Type", "Availability");
+        System.out.printf("%-20s %-20s %-20s %-15s \n", "--------", "----------", "----------", "------------");
+        for (Sport sport: sportsList){
+            System.out.printf("%-20s %-20s %-20s %-15s \n", sport.getSportID(), sport.getSportName(), sport.getSportType(), sport.getAvailability());
         }
+
+        //apply by selecting a sport id
+    }
 
     public void applyAvailableSports() throws Exception {
         Random random = new Random();
@@ -89,7 +93,12 @@ public class JavaKafkaStudent {
         }
     }
     public void viewApplication(){
-
+        System.out.printf("%-20s %-20s %-20s %-15s \n", "--------------", "---------", "-----", "---------------");
+        System.out.printf("%-20s %-20s %-20s %-15s \n", "Application ID", "Tryout ID", "Sport", "Approval Status");
+        System.out.printf("%-20s %-20s %-20s %-15s \n", "--------------", "---------", "-----", "---------------");
+        for (Application application: applicationsList){
+            System.out.printf("%-20s %-20s %-20s %-15s \n", application.getApplicationID(), application.getTryoutID(), DataKafka.findSportNameBySportID(application.getSportID()), application.getApprovalStatus());
+        }
     }
 
 }

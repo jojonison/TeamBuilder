@@ -39,6 +39,26 @@ public class DataKafka {
         return applications;
     }
 
+    public static ArrayList<Application> getOwnApplications(int studentID) throws Exception{
+        ArrayList<Application> applications = new ArrayList<Application>();
+        String query = "SELECT * FROM application WHERE studentid = ? ORDER BY applicationid";
+        Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_UPDATABLE);
+        ResultSet resultSet = statement.executeQuery(query);
+
+        while (resultSet.next()){
+            Application application = new Application(
+                    resultSet.getInt(1),
+                    resultSet.getInt(2),
+                    resultSet.getInt(3),
+                    resultSet.getInt(4),
+                    resultSet.getString(5)
+            );
+            applications.add(application);
+        }
+        resultSet.close();
+        return applications;
+    }
+
     public static Application findApplicationByApplicationID(int applicationID){
         Application application = null;
         String query = "SELECT * FROM application WHERE applicationid = ?";
@@ -118,6 +138,23 @@ public class DataKafka {
             System.out.println("Could not find '" + sportName  + "' applications.");
         }
         return applications;
+    }
+
+    public static void createApplication(int applicationID, int studentID, int sportID, int tryoutID, String approvalStatus){
+        String query = "INSERT INTO application(applicationid,studentid,sportid,tryoutid,departmentkey) VALUES(?,?,?,?,?)";
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(query,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            preparedStatement.setInt(1, applicationID);
+            preparedStatement.setInt(2, studentID);
+            preparedStatement.setInt(3, sportID);
+            preparedStatement.setInt(4, tryoutID);
+            preparedStatement.setString(5, approvalStatus);
+            preparedStatement.execute();
+            System.out.println("Successfully applied.");
+
+        } catch (SQLException e) {
+            System.out.println("Failed to apply.");
+        }
     }
 
     public static void updateApplicationStatus(int applicationID, String approvalStatus) {
@@ -315,6 +352,25 @@ public class DataKafka {
         return sports;
     }
 
+    public static ArrayList<Sport> getAvailableSports() throws  Exception{
+        ArrayList<Sport> sports = new ArrayList<Sport>();
+        String query = "SELECT * FROM sport WHERE availability = 'Available' ORDER BY sportid";
+        Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_UPDATABLE);
+        ResultSet resultSet = statement.executeQuery(query);
+
+        while (resultSet.next()){
+            Sport sport = new Sport(
+                    resultSet.getInt(1),
+                    resultSet.getString(2),
+                    resultSet.getString(3),
+                    resultSet.getString(4)
+            );
+            sports.add(sport);
+        }
+        resultSet.close();
+        return sports;
+    }
+
     public static void createSport(Sport sport){
         String query = "INSERT INTO sport(sportid,sportname,sporttype,availability) VALUES(?,?,?,?)";
         try {
@@ -363,6 +419,24 @@ public class DataKafka {
     public static Sport findSportBySportID(int sportID){
         Sport sport = null;
         String query = "SELECT * FROM sport WHERE sportid = ?";
+        try{
+            PreparedStatement preparedStatement = connection.prepareStatement(query,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            preparedStatement.setInt(1, sportID);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            resultSet.beforeFirst();
+            while (resultSet.next()){
+                sport = new Sport(resultSet.getInt(1),resultSet.getString(2),resultSet.getString(3),resultSet.getString(4));
+            }
+            resultSet.close();
+        }catch (Exception e){
+            System.out.println("Could not find sport " + sportID + ".");
+        }
+        return sport;
+    }
+
+    public static Sport findSportNameBySportID(int sportID){
+        Sport sport = null;
+        String query = "SELECT sportname FROM sport WHERE sportid = ?";
         try{
             PreparedStatement preparedStatement = connection.prepareStatement(query,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
             preparedStatement.setInt(1, sportID);
