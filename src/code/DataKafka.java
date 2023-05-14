@@ -673,15 +673,16 @@ public class DataKafka {
         return tryoutDetail;
     }
 
-    public static ArrayList<TryoutDetails> findTryoutsByCoachName(String firstname, String lastname){
+    public static ArrayList<TryoutDetails> findTryoutsByDepartmentKey(String departmentKey){
         ArrayList<TryoutDetails> tryouts = new ArrayList<>();
-        String query = "SELECT tryoutdetails.tryoutid, tryoutdetails.sportid, tryoutdetails.schedule, tryoutdetails.location FROM tryoutdetails " +
-                "NATURAL JOIN coach WHERE coach.firstname = ? OR coach.lastname = ? " +
+        String query = "SELECT tryoutdetails.tryoutid, tryoutdetails.sportid, tryoutdetails.schedule, tryoutdetails.location, tryoutdetals.coachid " +
+                "FROM tryoutdetails " +
+                "JOIN coach ON tryoutdetails.coachid = coach.coachid " +
+                "NATURAL JOIN department WHERE department.departmentkey = ? " +
                 "ORDER BY tryoutid";
         try{
             PreparedStatement preparedStatement = connection.prepareStatement(query,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            preparedStatement.setString(1, firstname);
-            preparedStatement.setString(2, lastname);
+            preparedStatement.setString(1, departmentKey);
             ResultSet resultSet = preparedStatement.executeQuery();
             resultSet.beforeFirst();
             while (resultSet.next()){
@@ -690,7 +691,7 @@ public class DataKafka {
             }
             resultSet.close();
         }catch (Exception e){
-            System.out.println("Could not find tryouts under coach " + firstname + " " + lastname + ".");
+            System.out.println("Could not find applications under " + departmentKey + " department.");
         }
         return tryouts;
     }

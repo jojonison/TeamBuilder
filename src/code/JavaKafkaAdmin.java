@@ -492,16 +492,16 @@ public class JavaKafkaAdmin {
         }
     }
 
-    public static void sortTryoutsByCoachName(String firstname, String lastname) throws Exception {
-        ArrayList<TryoutDetails> byFullName = DataKafka.findTryoutsByCoachName(firstname, lastname);
-        if (!byFullName.isEmpty()){
-            for (TryoutDetails tryout: byFullName) {
+    public static void sortTryoutsByDepartmentKey(String departmentKey) throws Exception {
+        ArrayList<TryoutDetails> byDepartmentKey = DataKafka.findTryoutsByDepartmentKey(departmentKey);
+        if (!byDepartmentKey .isEmpty()){
+            for (TryoutDetails tryout: byDepartmentKey ) {
                 System.out.printf("%-20s %-20s %-20s %-15s %-15s \n", tryout.getTryoutID(), tryout.getSportID(), tryout.getSchedule(), tryout.getLocation(), tryout.getCoachID());
             }
             System.out.println("\nSelect Tryout ID: ");
             int tryoutID = Integer.parseInt(bufferedReader.readLine());
 
-            for (TryoutDetails tryoutDetails : byFullName) {
+            for (TryoutDetails tryoutDetails : byDepartmentKey) {
                 if (tryoutID == tryoutDetails.getTryoutID()) {
                     selectTryoutID(tryoutID);
                     return;
@@ -828,11 +828,22 @@ public class JavaKafkaAdmin {
                     selectTryoutID(tryoutID);
                 }
                 case 2 -> {
-                    System.out.println("Enter Coach's First Name: ");
-                    String firstname = bufferedReader.readLine();
-                    System.out.println("Enter Coach's Last Name: ");
-                    String lastname = bufferedReader.readLine();
-                    sortTryoutsByCoachName(firstname, lastname);
+                    System.out.println("\nChoose what to view: ");
+                    System.out.println("a. SAMCIS Tryouts");
+                    System.out.println("b. SEA Tryouts");
+                    System.out.println("c. STELA Tryouts");
+                    System.out.println("d. SOL Tryouts");
+                    System.out.println("e. SOM Tryouts");
+                    String departmentChoice = bufferedReader.readLine();
+
+                    switch (departmentChoice) {
+                        case "a", "A": sortTryoutsByDepartmentKey("SAMCIS");
+                        case "b", "B": sortTryoutsByDepartmentKey("SEA");
+                        case "c", "C": sortTryoutsByDepartmentKey("STELA");
+                        case "d", "D": sortTryoutsByDepartmentKey("SOL");
+                        case "e", "E": sortTryoutsByDepartmentKey("SOM");
+                        default: System.out.println("Invalid input.");
+                    }
                 }
                 case 3 -> {
                     System.out.println("Enter Sport Name: ");
