@@ -44,7 +44,7 @@ public class JavaKafkaStudent {
     public void mainMenu() throws Exception{
         while (true) {
             applicationsList = DataKafka.getOwnApplications(studentID);
-            sportsList = DataKafka.getAvailableSports();
+            sportsList = DataKafka.getSports();
 
             System.out.println("Choose what to do: ");
             System.out.println("1. Show Available Sports");
@@ -97,7 +97,7 @@ public class JavaKafkaStudent {
         System.out.printf("%-20s %-20s %-20s %-15s \n", "Application ID", "Tryout ID", "Sport", "Approval Status");
         System.out.printf("%-20s %-20s %-20s %-15s \n", "--------------", "---------", "-----", "---------------");
         for (Application application: applicationsList){
-            System.out.printf("%-20s %-20s %-20s %-15s \n", application.getApplicationID(), application.getTryoutID(), DataKafka.findSportNameBySportID(application.getSportID()), application.getApprovalStatus());
+            //System.out.printf("%-20s %-20s %-20s %-15s \n", application.getApplicationID(), application.getTryoutID(), DataKafka.findSportNameBySportID(application.getSportID()), application.getApprovalStatus());
         }
     }
 
