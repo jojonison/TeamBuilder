@@ -3,6 +3,8 @@ package code;
 import tables.*;
 
 import java.sql.*;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
 
 public class DataKafka {
@@ -19,6 +21,36 @@ public class DataKafka {
         }
     }
 
+    public static Student logIn(String emailAdd, int password) throws Exception {
+        Student student = null;
+        try {
+            String query = "SELECT * FROM student WHERE emailaddress = ?";
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setString(1, emailAdd);
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+                int pw = resultSet.getInt("studentid");
+                if (pw != password) {
+                    System.out.println("Password is incorrect.");
+                } else {
+                    student = new Student(
+                            resultSet.getInt("studentid"),
+                            resultSet.getString("firstname"),
+                            resultSet.getString("lastname"),
+                            resultSet.getString("emailaddress"),
+                            resultSet.getString("departmentkey")
+                    );
+                }
+            }else {
+                System.out.println("Account not found.");
+            }
+        } catch (Exception e) {
+            System.out.println("Account not found.");
+        }
+        return student;
+    }
+
     public static ArrayList<Application> getApplications() throws Exception{
         ArrayList<Application> applications = new ArrayList<Application>();
         String query = "SELECT * FROM application ORDER BY applicationid";
@@ -31,7 +63,8 @@ public class DataKafka {
                     resultSet.getInt(2),
                     resultSet.getInt(3),
                     resultSet.getInt(4),
-                    resultSet.getString(5)
+                    resultSet.getString(5),
+                    resultSet.getString(6)
             );
             applications.add(application);
         }
@@ -39,23 +72,21 @@ public class DataKafka {
         return applications;
     }
 
-    public static ArrayList<Application> getOwnApplications(int studentID) throws Exception{
-        ArrayList<Application> applications = new ArrayList<Application>();
+    public static ArrayList<Application> getOwnApplications(int studentID) throws Exception {
+        ArrayList<Application> applications = new ArrayList<>();
         String query = "SELECT * FROM application WHERE studentid = ? ORDER BY applicationid";
-        Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_UPDATABLE);
-        ResultSet resultSet = statement.executeQuery(query);
-
-        while (resultSet.next()){
-            Application application = new Application(
-                    resultSet.getInt(1),
-                    resultSet.getInt(2),
-                    resultSet.getInt(3),
-                    resultSet.getInt(4),
-                    resultSet.getString(5)
-            );
-            applications.add(application);
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(query, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            preparedStatement.setInt(1, studentID);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                Application application = new Application(resultSet.getInt(1), resultSet.getInt(2), resultSet.getInt(3), resultSet.getInt(4), resultSet.getString(5), resultSet.getString(6));
+                applications.add(application);
+            }
+            resultSet.close();
+        } catch (Exception e) {
+            System.out.println("No applications found.");
         }
-        resultSet.close();
         return applications;
     }
 
@@ -68,7 +99,7 @@ public class DataKafka {
             ResultSet resultSet = preparedStatement.executeQuery();
             resultSet.beforeFirst();
             while (resultSet.next()){
-                application = new Application(resultSet.getInt(1), resultSet.getInt(2), resultSet.getInt(3), resultSet.getInt(4), resultSet.getString(5));
+                application = new Application(resultSet.getInt(1), resultSet.getInt(2), resultSet.getInt(3), resultSet.getInt(4), resultSet.getString(5), resultSet.getString(6));
             }
             resultSet.close();
         }catch (Exception e){
@@ -85,7 +116,7 @@ public class DataKafka {
             preparedStatement.setString(1, approvalStatus);
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()){
-                Application application = new Application(resultSet.getInt(1), resultSet.getInt(2), resultSet.getInt(3), resultSet.getInt(4), resultSet.getString(5));
+                Application application = new Application(resultSet.getInt(1), resultSet.getInt(2), resultSet.getInt(3), resultSet.getInt(4), resultSet.getString(5), resultSet.getString(6));
                 applications.add(application);
             }
             resultSet.close();
@@ -108,7 +139,7 @@ public class DataKafka {
             ResultSet resultSet = preparedStatement.executeQuery();
             resultSet.beforeFirst();
             while (resultSet.next()){
-                Application application = new Application(resultSet.getInt(1), resultSet.getInt(2), resultSet.getInt(3), resultSet.getInt(4), resultSet.getString(5));
+                Application application = new Application(resultSet.getInt(1), resultSet.getInt(2), resultSet.getInt(3), resultSet.getInt(4), resultSet.getString(5), resultSet.getString(6));
                 applications.add(application);
             }
             resultSet.close();
@@ -130,7 +161,7 @@ public class DataKafka {
             ResultSet resultSet = preparedStatement.executeQuery();
             resultSet.beforeFirst();
             while (resultSet.next()){
-                Application application = new Application(resultSet.getInt(1), resultSet.getInt(2), resultSet.getInt(3), resultSet.getInt(4), resultSet.getString(5));
+                Application application = new Application(resultSet.getInt(1), resultSet.getInt(2), resultSet.getInt(3), resultSet.getInt(4), resultSet.getString(5), resultSet.getString(6));
                 applications.add(application);
             }
             resultSet.close();
@@ -140,16 +171,89 @@ public class DataKafka {
         return applications;
     }
 
-    public static void createApplication(int applicationID, int studentID, int sportID, int tryoutID, String approvalStatus){
-        String query = "INSERT INTO application(applicationid,studentid,sportid,tryoutid,departmentkey) VALUES(?,?,?,?,?)";
+    public static int getCoachIDBySportID(int sportID) {
         try {
-            PreparedStatement preparedStatement = connection.prepareStatement(query,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            preparedStatement.setInt(1, applicationID);
-            preparedStatement.setInt(2, studentID);
-            preparedStatement.setInt(3, sportID);
-            preparedStatement.setInt(4, tryoutID);
-            preparedStatement.setString(5, approvalStatus);
-            preparedStatement.execute();
+            String query = "SELECT coachid FROM coach WHERE sportid = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setInt(1, sportID);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getInt("coachid");
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return -1;
+    }
+
+    public static String getScheduleBySportID(int sportID) {
+        try {
+            String query = "SELECT schedule FROM tryoutdetails WHERE sportid = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setInt(1, sportID);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getString("schedule");
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return "No schedule yet.";
+    }
+
+    public static String getLocationBySportID(int sportID) {
+        try {
+            String query = "SELECT location FROM tryoutdetails WHERE sportid = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setInt(1, sportID);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getString("location");
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return "No location yet.";
+    }
+
+    public static void createApplication(int studentID, int sportID, String approvalStatus, String applicationDate){
+        try {
+            String appIDQuery = "SELECT MAX(applicationid) FROM application";
+            Statement appIDStatement = connection.createStatement();
+            ResultSet appIDResultSet = appIDStatement.executeQuery(appIDQuery);
+            int applicationID = 0;
+            if (appIDResultSet.next()){
+                applicationID = appIDResultSet.getInt(1);
+            }
+            int newAppID = applicationID + 1;
+
+            String tryoutIDQuery = "SELECT MAX(tryoutid) FROM tryoutdetails";
+            Statement tryoutIDStatement = connection.createStatement();
+            ResultSet tryoutIDResultSet = tryoutIDStatement.executeQuery(tryoutIDQuery);
+            int tryoutID = 0;
+            if (tryoutIDResultSet.next()){
+                tryoutID = tryoutIDResultSet.getInt(1);
+            }
+            int newTryoutID = tryoutID + 1;
+
+            String tryoutQuery = "INSERT INTO tryoutdetails(tryoutid,sportid,schedule,location,coachid) VALUES(?,?,?,?,?)";
+            PreparedStatement tryoutPreparedStatement = connection.prepareStatement(tryoutQuery,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            tryoutPreparedStatement.setInt(1, newTryoutID);
+            tryoutPreparedStatement.setInt(2, sportID);
+            tryoutPreparedStatement.setString(3, getScheduleBySportID(sportID));
+            tryoutPreparedStatement.setString(4, getLocationBySportID(sportID));
+            tryoutPreparedStatement.setInt(5, getCoachIDBySportID(sportID));
+            tryoutPreparedStatement.execute();
+
+            String appQuery = "INSERT INTO application(applicationid,studentid,sportid,tryoutid,approvalstatus,applicationdate) VALUES(?,?,?,?,?,?)";
+            PreparedStatement appPreparedStatement = connection.prepareStatement(appQuery,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            appPreparedStatement.setInt(1, newAppID);
+            appPreparedStatement.setInt(2, studentID);
+            appPreparedStatement.setInt(3, sportID);
+            appPreparedStatement.setInt(4, newTryoutID);
+            appPreparedStatement.setString(5, approvalStatus);
+            appPreparedStatement.setString(6, applicationDate);
+            appPreparedStatement.execute();
             System.out.println("Successfully applied.");
 
         } catch (SQLException e) {
@@ -669,6 +773,24 @@ public class DataKafka {
             resultSet.close();
         }catch (Exception e){
             System.out.println("Could not find tryout " + tryoutID + ".");
+        }
+        return tryoutDetail;
+    }
+
+    public static TryoutDetails getDetailsOfSportBySportID(int sportID) {
+        TryoutDetails tryoutDetail = null;
+        String query = "SELECT * FROM tryoutdetails LEFT OUTER JOIN sport ON tryoutdetails.sportid = sport.sportid WHERE sportid = ?";
+        try{
+            PreparedStatement preparedStatement = connection.prepareStatement(query,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            preparedStatement.setInt(1, sportID);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            resultSet.beforeFirst();
+            while (resultSet.next()){
+                tryoutDetail = new TryoutDetails(resultSet.getInt(1), resultSet.getInt(2), resultSet.getString(3), resultSet.getString(4), resultSet.getInt(5));
+            }
+            resultSet.close();
+        }catch (Exception e){
+            System.out.println("Could not find tryout details for sport " + sportID + ".");
         }
         return tryoutDetail;
     }

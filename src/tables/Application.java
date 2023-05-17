@@ -6,13 +6,15 @@ public class Application {
     private int sportID;
     private int tryoutID;
     private String approvalStatus;
+    private String applicationDate;
 
-    public Application(int applicationID, int studentID, int sportID, int tryoutID, String approvalStatus) {
+    public Application(int applicationID, int studentID, int sportID, int tryoutID, String approvalStatus, String applicationDate) {
         this.applicationID = applicationID;
         this.studentID = studentID;
         this.sportID = sportID;
         this.tryoutID = tryoutID;
         this.approvalStatus = approvalStatus;
+        this.applicationDate = applicationDate;
     }
 
     public int getApplicationID() {
@@ -50,4 +52,10 @@ public class Application {
     }
 
     public void setApprovalStatus(String approvalStatus) {this.approvalStatus = approvalStatus;}
+
+    public String getApplicationDate() {
+        return applicationDate;
+    }
+
+    public void setApplicationDate(String applicationDate) {this.applicationDate = applicationDate;}
 }

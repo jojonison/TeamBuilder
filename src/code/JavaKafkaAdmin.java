@@ -19,18 +19,18 @@ public class JavaKafkaAdmin {
     public static ArrayList<TryoutDetails> tryoutsList;
 
     public static void readAllApplications(){
-        System.out.printf("%-20s %-20s %-20s %-15s %-15s \n", "--------------", "----------", "--------", "---------", "---------------");
-        System.out.printf("%-20s %-20s %-20s %-15s %-15s \n", "Application ID", "Student ID", "Sport ID", "Tryout ID", "Approval Status");
-        System.out.printf("%-20s %-20s %-20s %-15s %-15s \n", "--------------", "----------", "--------", "---------", "---------------");
+        System.out.printf("%-20s %-20s %-20s %-20s %-20s %-20s \n", "--------------", "----------", "--------", "---------", "---------------", "----------------");
+        System.out.printf("%-20s %-20s %-20s %-20s %-20s %-20s \n", "Application ID", "Student ID", "Sport ID", "Tryout ID", "Approval Status", "Application Date");
+        System.out.printf("%-20s %-20s %-20s %-20s %-20s %-20s \n", "--------------", "----------", "--------", "---------", "---------------", "----------------");
         for (Application application: applicationsList){
-            System.out.printf("%-20s %-20s %-20s %-15s %-15s \n", application.getApplicationID(), application.getStudentID(), application.getSportID(), application.getTryoutID(), application.getApprovalStatus());
+            System.out.printf("%-20s %-20s %-20s %-20s %-20s %-20s \n", application.getApplicationID(), application.getStudentID(), application.getSportID(), application.getTryoutID(), application.getApprovalStatus(), application.getApplicationDate());
         }
     }
 
     public static void selectApplicationID(int applicationID) throws Exception {
         Application application = DataKafka.selectApplicationByApplicationID(applicationID);
         if (application != null){
-            System.out.printf("%-20s %-20s %-20s %-15s %-15s \n", application.getApplicationID(), application.getStudentID(), application.getSportID(), application.getTryoutID(), application.getApprovalStatus());
+            System.out.printf("%-20s %-20s %-20s %-20s %-20s %-20s \n", application.getApplicationID(), application.getStudentID(), application.getSportID(), application.getTryoutID(), application.getApprovalStatus(), application.getApplicationDate());
 
             if (application.getApprovalStatus().equals("Pending")) {
                 System.out.println("\nChoose what to do: ");
@@ -64,7 +64,7 @@ public class JavaKafkaAdmin {
         ArrayList<Application> byApprovalStatus = DataKafka.findApplicationsByApprovalStatus(approvalStatus);
         if (!byApprovalStatus.isEmpty()){
             for (Application application : byApprovalStatus) {
-                System.out.printf("%-20s %-20s %-20s %-15s %-15s \n", application.getApplicationID(), application.getStudentID(), application.getSportID(), application.getTryoutID(), application.getApprovalStatus());
+                System.out.printf("%-20s %-20s %-20s %-20s %-20s %-20s \n", application.getApplicationID(), application.getStudentID(), application.getSportID(), application.getTryoutID(), application.getApprovalStatus(), application.getApplicationDate());
             }
             System.out.println("\nSelect Application ID: ");
             int applicationID = Integer.parseInt(bufferedReader.readLine());
@@ -85,7 +85,7 @@ public class JavaKafkaAdmin {
         ArrayList<Application> byDepartmentKey = DataKafka.findApplicationsByDepartmentKey(departmentKey);
         if (!byDepartmentKey.isEmpty()){
             for (Application application : byDepartmentKey) {
-                System.out.printf("%-20s %-20s %-20s %-15s %-15s \n", application.getApplicationID(), application.getStudentID(), application.getSportID(), application.getTryoutID(), application.getApprovalStatus());
+                System.out.printf("%-20s %-20s %-20s %-20s %-20s %-20s \n", application.getApplicationID(), application.getStudentID(), application.getSportID(), application.getTryoutID(), application.getApprovalStatus(), application.getApplicationDate());
             }
             System.out.println("\nSelect Application ID: ");
             int applicationID = Integer.parseInt(bufferedReader.readLine());
@@ -106,7 +106,7 @@ public class JavaKafkaAdmin {
         ArrayList<Application> bySportName = DataKafka.findApplicationsBySportName(sportName);
         if (!bySportName.isEmpty()){
             for (Application application : bySportName) {
-                System.out.printf("%-20s %-20s %-20s %-15s %-15s \n", application.getApplicationID(), application.getStudentID(), application.getSportID(), application.getTryoutID(), application.getApprovalStatus());
+                System.out.printf("%-20s %-20s %-20s %-20s %-20s %-20s \n", application.getApplicationID(), application.getStudentID(), application.getSportID(), application.getTryoutID(), application.getApprovalStatus(), application.getApplicationDate());
             }
             System.out.println("\nSelect Application ID: ");
             int applicationID = Integer.parseInt(bufferedReader.readLine());
@@ -124,11 +124,11 @@ public class JavaKafkaAdmin {
     }
 
     public static void readAllCoaches(){
-        System.out.printf("%-20s %-20s %-20s %-15s %-15s \n", "--------", "----------", "---------", "--------", "--------------");
-        System.out.printf("%-20s %-20s %-20s %-15s %-15s \n", "Coach ID", "First Name", "Last Name", "Sport ID", "Department Key");
-        System.out.printf("%-20s %-20s %-20s %-15s %-15s \n", "--------", "----------", "---------", "--------", "--------------");
+        System.out.printf("%-20s %-20s %-20s %-20s %-20s \n", "--------", "----------", "---------", "--------", "--------------");
+        System.out.printf("%-20s %-20s %-20s %-20s %-20s \n", "Coach ID", "First Name", "Last Name", "Sport ID", "Department Key");
+        System.out.printf("%-20s %-20s %-20s %-20s %-20s \n", "--------", "----------", "---------", "--------", "--------------");
         for (Coach coach: coachesList){
-            System.out.printf("%-20s %-20s %-20s %-15s %-15s \n", coach.getCoachID(), coach.getFirstName(), coach.getLastName(), coach.getSportID(), coach.getDepartmentKey());
+            System.out.printf("%-20s %-20s %-20s %-20s %-20s \n", coach.getCoachID(), coach.getFirstName(), coach.getLastName(), coach.getSportID(), coach.getDepartmentKey());
         }
     }
 
@@ -160,7 +160,7 @@ public class JavaKafkaAdmin {
     public static void selectCoachID(int coachID) throws Exception {
         Coach coach = DataKafka.selectCoachByCoachID(coachID);
         if (coach != null){
-            System.out.printf("%-20s %-20s %-20s %-15s %-15s \n", coach.getCoachID(), coach.getFirstName(), coach.getLastName(), coach.getSportID(), coach.getDepartmentKey());
+            System.out.printf("%-20s %-20s %-20s %-20s %-20s \n", coach.getCoachID(), coach.getFirstName(), coach.getLastName(), coach.getSportID(), coach.getDepartmentKey());
             System.out.println("\nChoose what to do: ");
             System.out.println("1. Edit Coach Details");
             System.out.println("2. Remove Coach");
@@ -182,7 +182,7 @@ public class JavaKafkaAdmin {
         ArrayList<Coach> byCoachName = DataKafka.findCoachByCoachName(firstname, lastname);
         if (!byCoachName.isEmpty()){
             for (Coach coach : byCoachName) {
-                System.out.printf("%-20s %-20s %-20s %-15s %-15s \n", coach.getCoachID(), coach.getFirstName(), coach.getLastName(), coach.getSportID(), coach.getDepartmentKey());
+                System.out.printf("%-20s %-20s %-20s %-20s %-20s \n", coach.getCoachID(), coach.getFirstName(), coach.getLastName(), coach.getSportID(), coach.getDepartmentKey());
             }
             System.out.println("\nSelect Coach ID: ");
             int coachID = Integer.parseInt(bufferedReader.readLine());
@@ -203,7 +203,7 @@ public class JavaKafkaAdmin {
         ArrayList<Coach> byDepartmentKey = DataKafka.findCoachesByDepartmentKey(departmentKey);
         if (!byDepartmentKey.isEmpty()){
             for (Coach coach : byDepartmentKey) {
-                System.out.printf("%-20s %-20s %-20s %-15s %-15s \n", coach.getCoachID(), coach.getFirstName(), coach.getLastName(), coach.getSportID(), coach.getDepartmentKey());
+                System.out.printf("%-20s %-20s %-20s %-20s %-20s \n", coach.getCoachID(), coach.getFirstName(), coach.getLastName(), coach.getSportID(), coach.getDepartmentKey());
             }
             System.out.println("\nSelect Coach ID: ");
             int coachID = Integer.parseInt(bufferedReader.readLine());
@@ -224,7 +224,7 @@ public class JavaKafkaAdmin {
         ArrayList<Coach> bySportName = DataKafka.findCoachesBySportName(sportName);
         if (!bySportName.isEmpty()){
             for (Coach coach : bySportName) {
-                System.out.printf("%-20s %-20s %-20s %-15s %-15s \n", coach.getCoachID(), coach.getFirstName(), coach.getLastName(), coach.getSportID(), coach.getDepartmentKey());
+                System.out.printf("%-20s %-20s %-20s %-20s %-20s \n", coach.getCoachID(), coach.getFirstName(), coach.getLastName(), coach.getSportID(), coach.getDepartmentKey());
             }
             System.out.println("\nSelect Coach ID: ");
             int coachID = Integer.parseInt(bufferedReader.readLine());
@@ -256,18 +256,18 @@ public class JavaKafkaAdmin {
     }
 
     public static void readAllSports(){
-        System.out.printf("%-20s %-20s %-20s %-15s \n", "--------", "----------", "----------", "------------");
-        System.out.printf("%-20s %-20s %-20s %-15s \n", "Sport ID", "Sport Name", "Sport Type", "Availability");
-        System.out.printf("%-20s %-20s %-20s %-15s \n", "--------", "----------", "----------", "------------");
+        System.out.printf("%-20s %-20s %-20s %-20s \n", "--------", "----------", "----------", "------------");
+        System.out.printf("%-20s %-20s %-20s %-20s \n", "Sport ID", "Sport Name", "Sport Type", "Availability");
+        System.out.printf("%-20s %-20s %-20s %-20s \n", "--------", "----------", "----------", "------------");
         for (Sport sport: sportsList){
-            System.out.printf("%-20s %-20s %-20s %-15s \n", sport.getSportID(), sport.getSportName(), sport.getSportType(), sport.getAvailability());
+            System.out.printf("%-20s %-20s %-20s %-20s \n", sport.getSportID(), sport.getSportName(), sport.getSportType(), sport.getAvailability());
         }
     }
 
     public static void selectSportId(int sportID) throws Exception {
         Sport sport = DataKafka.selectSportBySportID(sportID);
         if (sport != null){
-            System.out.printf("%-20s %-20s %-20s %-15s \n", "Sport details: ", sport.getSportName(), sport.getSportType(), sport.getAvailability());
+            System.out.printf("%-20s %-20s %-20s %-20s \n", "Sport details: ", sport.getSportName(), sport.getSportType(), sport.getAvailability());
             System.out.println("\nChoose what to do: ");
             System.out.println("1. Edit Sport Details");
             System.out.println("2. Delete Sport");
@@ -293,7 +293,7 @@ public class JavaKafkaAdmin {
     public static void findSportBySportName(String sportName) throws Exception {
         Sport sport = DataKafka.findSportBySportName(sportName);
         if (sport != null){
-            System.out.printf("%-20s %-20s %-20s %-15s \n", "Sport details: ", sport.getSportID(), sport.getSportType(), sport.getAvailability());
+            System.out.printf("%-20s %-20s %-20s %-20s \n", "Sport details: ", sport.getSportID(), sport.getSportType(), sport.getAvailability());
             System.out.println("\nChoose what to do: ");
             System.out.println("1. Edit Sport Details");
             System.out.println("2. Delete Sport");
@@ -315,7 +315,7 @@ public class JavaKafkaAdmin {
         ArrayList<Sport> bySportType = DataKafka.findSportsBySportType(sportType);
         if (!bySportType.isEmpty()){
             for (Sport sport : bySportType) {
-                System.out.printf("%-20s %-20s %-15s \n", sport.getSportID(), sport.getSportName(), sport.getAvailability());
+                System.out.printf("%-20s %-20s %-20s \n", sport.getSportID(), sport.getSportName(), sport.getAvailability());
             }
             System.out.println("\nSelect Sport ID: ");
             int sportID = Integer.parseInt(bufferedReader.readLine());
@@ -336,7 +336,7 @@ public class JavaKafkaAdmin {
         ArrayList<Sport> byAvailability = DataKafka.findSportsByAvailability(availability);
         if (!byAvailability.isEmpty()){
             for (Sport sport : byAvailability) {
-                System.out.printf("%-20s %-20s %-15s \n", sport.getSportID(), sport.getSportName(), sport.getSportType());
+                System.out.printf("%-20s %-20s %-20s \n", sport.getSportID(), sport.getSportName(), sport.getSportType());
             }
             System.out.println("\nSelect Sport ID: ");
             int sportID = Integer.parseInt(bufferedReader.readLine());
@@ -368,18 +368,18 @@ public class JavaKafkaAdmin {
     }
 
     public static void readAllStudents(){
-        System.out.printf("%-20s %-20s %-20s %-15s %-15s \n", "----------", "----------", "---------", "-------------", "--------------");
-        System.out.printf("%-20s %-20s %-20s %-15s %-15s \n", "Student ID", "First Name", "Last Name", "Email Address", "Department Key");
-        System.out.printf("%-20s %-20s %-20s %-15s %-15s \n", "----------", "----------", "---------", "-------------", "--------------");
+        System.out.printf("%-20s %-20s %-20s %-20s %-20s \n", "----------", "----------", "---------", "-------------", "--------------");
+        System.out.printf("%-20s %-20s %-20s %-20s %-20s \n", "Student ID", "First Name", "Last Name", "Email Address", "Department Key");
+        System.out.printf("%-20s %-20s %-20s %-20s %-20s \n", "----------", "----------", "---------", "-------------", "--------------");
         for (Student student: studentsList){
-            System.out.printf("%-20s %-20s %-20s %-15s %-15s \n", student.getStudentID(), student.getFirstName(), student.getLastName(), student.getEmailAddress(), student.getDepartmentKey());
+            System.out.printf("%-20s %-20s %-20s %-20s %-20s \n", student.getStudentID(), student.getFirstName(), student.getLastName(), student.getEmailAddress(), student.getDepartmentKey());
         }
     }
 
     public static void selectStudentId(int studentID) throws Exception {
         Student student = DataKafka.selectStudentByStudentID(studentID);
         if (student != null){
-            System.out.printf("%-20s %-20s %-20s %-15s %-15s \n", student.getStudentID(), student.getFirstName(), student.getLastName(), student.getEmailAddress(), student.getDepartmentKey());
+            System.out.printf("%-20s %-20s %-20s %-20s %-20s \n", student.getStudentID(), student.getFirstName(), student.getLastName(), student.getEmailAddress(), student.getDepartmentKey());
             System.out.println("\nChoose what to do: ");
             System.out.println("1. Edit Student Details");
             System.out.println("2. Remove Student");
@@ -401,7 +401,7 @@ public class JavaKafkaAdmin {
         ArrayList<Student> byStudentName = DataKafka.findStudentByStudentName(firstname, lastname);
         if (!byStudentName.isEmpty()){
             for (Student student : byStudentName) {
-                System.out.printf("%-20s %-20s %-20s %-15s %-15s \n", student.getStudentID(), student.getFirstName(), student.getLastName(), student.getEmailAddress(), student.getDepartmentKey());
+                System.out.printf("%-20s %-20s %-20s %-20s %-20s \n", student.getStudentID(), student.getFirstName(), student.getLastName(), student.getEmailAddress(), student.getDepartmentKey());
             }
             System.out.println("\nSelect Student ID: ");
             int studentID = Integer.parseInt(bufferedReader.readLine());
@@ -422,7 +422,7 @@ public class JavaKafkaAdmin {
         ArrayList<Student> byDepartmentKey = DataKafka.findStudentsByDepartmentKey(departmentKey);
         if (!byDepartmentKey.isEmpty()){
             for (Student student : byDepartmentKey) {
-                System.out.printf("%-20s %-20s %-20s %-15s %-15s \n", student.getStudentID(), student.getFirstName(), student.getLastName(), student.getEmailAddress(), student.getDepartmentKey());
+                System.out.printf("%-20s %-20s %-20s %-20s %-20s \n", student.getStudentID(), student.getFirstName(), student.getLastName(), student.getEmailAddress(), student.getDepartmentKey());
             }
             System.out.println("\nSelect Student ID: ");
             int studentID = Integer.parseInt(bufferedReader.readLine());
@@ -463,18 +463,18 @@ public class JavaKafkaAdmin {
     }
 
     public static void readAllTryouts(){
-        System.out.printf("%-20s %-20s %-20s %-15s %-15s \n", "---------", "--------", "--------", "--------", "--------");
-        System.out.printf("%-20s %-20s %-20s %-15s %-15s \n", "Tryout ID", "Sport ID", "Schedule", "Location", "Coach ID");
-        System.out.printf("%-20s %-20s %-20s %-15s %-15s \n", "---------", "--------", "--------", "--------", "--------");
+        System.out.printf("%-20s %-20s %-20s %-20s %-20s \n", "---------", "--------", "--------", "--------", "--------");
+        System.out.printf("%-20s %-20s %-20s %-20s %-20s \n", "Tryout ID", "Sport ID", "Schedule", "Location", "Coach ID");
+        System.out.printf("%-20s %-20s %-20s %-20s %-20s \n", "---------", "--------", "--------", "--------", "--------");
         for (TryoutDetails tryout: tryoutsList){
-            System.out.printf("%-20s %-20s %-20s %-15s %-15s \n", tryout.getTryoutID(), tryout.getSportID(), tryout.getSchedule(), tryout.getLocation(), tryout.getCoachID());
+            System.out.printf("%-20s %-20s %-20s %-20s %-20s \n", tryout.getTryoutID(), tryout.getSportID(), tryout.getSchedule(), tryout.getLocation(), tryout.getCoachID());
         }
     }
 
     public static void selectTryoutID(int tryoutID) throws Exception {
         TryoutDetails tryout = DataKafka.selectTryoutByTryoutID(tryoutID);
         if (tryout != null){
-            System.out.printf("%-20s %-20s %-20s %-15s %-15s \n", tryout.getTryoutID(), tryout.getSportID(), tryout.getSchedule(), tryout.getLocation(), tryout.getCoachID());
+            System.out.printf("%-20s %-20s %-20s %-20s %-20s \n", tryout.getTryoutID(), tryout.getSportID(), tryout.getSchedule(), tryout.getLocation(), tryout.getCoachID());
             System.out.println("\nChoose what to do: ");
             System.out.println("1. Edit Tryout Details");
             System.out.println("2. Delete Tryout Details");
@@ -496,7 +496,7 @@ public class JavaKafkaAdmin {
         ArrayList<TryoutDetails> byDepartmentKey = DataKafka.findTryoutsByDepartmentKey(departmentKey);
         if (!byDepartmentKey .isEmpty()){
             for (TryoutDetails tryout: byDepartmentKey ) {
-                System.out.printf("%-20s %-20s %-20s %-15s %-15s \n", tryout.getTryoutID(), tryout.getSportID(), tryout.getSchedule(), tryout.getLocation(), tryout.getCoachID());
+                System.out.printf("%-20s %-20s %-20s %-20s %-20s \n", tryout.getTryoutID(), tryout.getSportID(), tryout.getSchedule(), tryout.getLocation(), tryout.getCoachID());
             }
             System.out.println("\nSelect Tryout ID: ");
             int tryoutID = Integer.parseInt(bufferedReader.readLine());
@@ -517,7 +517,7 @@ public class JavaKafkaAdmin {
         ArrayList<TryoutDetails> bySportName = DataKafka.findTryoutsBySportName(sportName);
         if (!bySportName.isEmpty()){
             for (TryoutDetails tryout : bySportName) {
-                System.out.printf("%-20s %-20s %-20s %-15s %-15s \n", tryout.getTryoutID(), tryout.getSportID(), tryout.getSchedule(), tryout.getLocation(), tryout.getCoachID());
+                System.out.printf("%-20s %-20s %-20s %-20s %-20s \n", tryout.getTryoutID(), tryout.getSportID(), tryout.getSchedule(), tryout.getLocation(), tryout.getCoachID());
             }
             System.out.println("\nSelect Tryout ID: ");
             int tryoutID = Integer.parseInt(bufferedReader.readLine());
