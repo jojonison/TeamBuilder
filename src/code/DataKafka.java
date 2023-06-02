@@ -21,6 +21,25 @@ public class DataKafka {
         }
     }
 
+    public static ArrayList<Tryouts> allTryOuts() throws Exception{
+        ArrayList<Tryouts> tryouts = new ArrayList<Tryouts>();
+        String query = "SELECT * FROM tryouts";
+        Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_UPDATABLE);
+        ResultSet resultSet = statement.executeQuery(query);
+        while (resultSet.next()){
+            Tryouts tryout = new Tryouts(
+                    resultSet.getInt(1),
+                    resultSet.getInt(2),
+                    resultSet.getInt(3),
+                    resultSet.getString(4)
+            );
+            tryouts.add(tryout);
+        }
+        resultSet.close();
+        return tryouts;
+    }
+
+
     public static Student logIn(String emailAdd, int password) throws Exception {
         Student student = null;
         try {
@@ -108,6 +127,29 @@ public class DataKafka {
         return application;
     }
 
+    public static Tryouts selectTryoutByTryoutNo(int tryoutNo){
+        Tryouts tryout = null;
+        String query = "SELECT * FROM tryouts WHERE tryoutno = ?";
+        try{
+            PreparedStatement preparedStatement = connection.prepareStatement(query,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            preparedStatement.setInt(1, tryoutNo);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            resultSet.beforeFirst();
+            while (resultSet.next()){
+                tryout = new Tryouts(
+                        resultSet.getInt(1),
+                        resultSet.getInt(2),
+                        resultSet.getInt(3),
+                        resultSet.getString(4)
+                );
+            }
+            resultSet.close();
+        }catch (Exception e){
+            System.out.println("Could not find tryoutNo " + tryoutNo + ".");
+        }
+        return tryout;
+    }
+
     public static ArrayList<Application> findApplicationsByApprovalStatus(String approvalStatus) {
         ArrayList<Application> applications = new ArrayList<>();
         String query = "SELECT * FROM application WHERE approvalstatus = ? ORDER BY applicationid";
@@ -193,12 +235,13 @@ public class DataKafka {
             preparedStatement.setInt(1, sportID);
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
+                System.out.println(resultSet.getString("schedule"));
                 return resultSet.getString("schedule");
             }
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
-        return "No schedule yet.";
+        return null;
     }
 
     public static String getLocationBySportID(int sportID) {
@@ -257,6 +300,7 @@ public class DataKafka {
             System.out.println("Successfully applied.");
 
         } catch (SQLException e) {
+            e.printStackTrace();
             System.out.println("Failed to apply.");
         }
     }
@@ -583,6 +627,25 @@ public class DataKafka {
         }
     }
 
+    public static void createTryouts(TryoutDetails tryoutDetails){
+        String query = "INSERT INTO tryoutdetails(tryoutid,sportid,schedule,location,coachid) VALUES(?,?,?,?,?)";
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(query,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            preparedStatement.setInt(1, tryoutDetails.getTryoutID());
+            preparedStatement.setInt(2, tryoutDetails.getSportID());
+            preparedStatement.setString(3, tryoutDetails.getSchedule());
+            preparedStatement.setString(4, tryoutDetails.getLocation());
+            preparedStatement.setInt(5, tryoutDetails.getCoachID());
+            preparedStatement.execute();
+            System.out.println("Tryout Details with the following details is added: \n" + tryoutDetails);
+
+        } catch (SQLException e) {
+            System.out.println("Failed to add Tryout Details " + tryoutDetails.getSportID() + ".");
+        }
+    }
+
+
+
     public static void updateSport(Sport sport, int sportID){
         String query = "UPDATE sport SET sportid=?, sportname=?, sporttype=?, availability=? WHERE sportid=?";
         try {
@@ -839,21 +902,51 @@ public class DataKafka {
         return tryouts;
     }
 
-    public static void updateTryouts(TryoutDetails tryouts, int tryoutID){
+    public static void updateTryouts(TryoutDetails tryouts, int tryoutID, String schedule, String location){
         String query = "UPDATE tryoutdetails SET tryoutid=?, sportid=?, schedule=?, location=?, coachid=? WHERE tryoutid=?";
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(query,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
             preparedStatement.setInt(1, tryouts.getTryoutID());
             preparedStatement.setInt(2, tryouts.getSportID());
-            preparedStatement.setString(3, tryouts.getSchedule());
-            preparedStatement.setString(4, tryouts.getLocation());
+            preparedStatement.setString(3, schedule);
+            preparedStatement.setString(4, location);
             preparedStatement.setInt(5, tryouts.getCoachID());
-            preparedStatement.setInt(5, tryoutID);
+            preparedStatement.setInt(6, tryoutID);
             preparedStatement.execute();
             System.out.println("Tryout " + tryoutID + " updated.");
+
         } catch (SQLException e) {
             e.printStackTrace();
             System.out.println("Failed to update tryout " + tryoutID + ".");
+        }
+    }
+
+    public static void updateTryout(Tryouts tryout, int tryoutNo, String comments){
+        String query = "UPDATE tryouts SET tryoutno=?, tryoutid=?, applicationid=?, comments=? WHERE tryoutno=?";
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(query,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            preparedStatement.setInt(1, tryout.getTryoutNo());
+            preparedStatement.setInt(2, tryout.getTryoutId());
+            preparedStatement.setInt(3, tryout.getApplicationId());
+            preparedStatement.setString(4, comments);
+            preparedStatement.setInt(5, tryoutNo);
+            preparedStatement.execute();
+            System.out.println("Tryout " + tryoutNo + " updated.");
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("Failed to update tryout " + tryoutNo + ".");
+        }
+    }
+
+    public static void deleteTryout(int tryoutNo){
+        String query = "DELETE from tryout where tryoutid = ?";
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(query,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            preparedStatement.setInt(1, tryoutNo);
+            preparedStatement.execute();
+            System.out.println("Tryout " + tryoutNo + " removed.");
+        } catch (SQLException e) {
+            System.out.println("Failed to remove tryout " + tryoutNo + ".");
         }
     }
 

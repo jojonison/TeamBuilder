@@ -2,6 +2,7 @@ package code;
 
 import tables.*;
 
+import javax.xml.crypto.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -353,6 +354,32 @@ public class JavaKafkaAdmin {
         }
     }
 
+    public static void createTryoutDetails() throws Exception{
+        while (true){
+            sportsList = DataKafka.getSports();
+            readAllSports();
+            System.out.println("Select Sport to create Tryout Details");
+            int sportsID = Integer.parseInt(bufferedReader.readLine());
+            int coachID = DataKafka.getCoachIDBySportID(sportsID);
+            if (coachID == -1){
+                System.out.println("System will now Exit. No Coach for this sport");
+                System.exit(0);
+            }
+            System.out.println("Create Tryout ID: ");
+            int tryoutID = Integer.parseInt(bufferedReader.readLine());
+            System.out.println("Create schedule. Please follow this format. (yy-mm-day) (hr:mm:ss): ");
+            String schedule = bufferedReader.readLine();
+            System.out.println("Create Location: ");
+            String location = bufferedReader.readLine();
+
+
+            TryoutDetails newTryoutDetails = new TryoutDetails(tryoutID, sportsID, schedule, location, coachID);
+            DataKafka.createTryouts(newTryoutDetails);
+            break;
+        }
+
+    }
+
     public static void createSport() throws Exception{
         System.out.println("Create Sport ID: ");
         int sportID = Integer.parseInt(bufferedReader.readLine());
@@ -483,8 +510,53 @@ public class JavaKafkaAdmin {
             int choice = Integer.parseInt(bufferedReader.readLine());
 
             switch (choice) {
-                case 1: DataKafka.updateTryouts(tryout, tryoutID);
-                case 2: DataKafka.deleteTryouts(tryoutID);
+                case 1:
+                    System.out.println("Input the new schedule using this format: (yy-mm-day) (hr:mm:ss)");
+                    System.out.println("E.g : 2023-02-13 17:31:22");
+                    System.out.println("Enter new schedule: ");
+                    String newSchedule = bufferedReader.readLine();
+                    System.out.println("Enter new Location");
+                    String newLocation = bufferedReader.readLine();
+                    DataKafka.updateTryouts(tryout, tryoutID, newSchedule, newLocation);
+                    System.exit(0);
+                case 2:
+                    DataKafka.deleteTryouts(tryoutID);
+                case 3:
+                    mainMenu();
+            }
+        } else {
+            System.out.println("Invalid input.");
+        }
+    }
+
+    public static void selectTryoutNo(int tryoutNo) throws Exception {
+        Tryouts tryout = DataKafka.selectTryoutByTryoutNo(tryoutNo);
+        if (tryout != null){
+            System.out.printf("%-20s %-20s %-20s %-20s \n", tryout.getTryoutNo(), tryout.getTryoutId(), tryout.getApplicationId(), tryout.getComments());
+            System.out.println("\nChoose what to do: ");
+            System.out.println("1. Edit Comments");
+            System.out.println("2. Delete Tryout");
+            System.out.println("3. Back to Main Menu");
+            System.out.print("Choice: ");
+            int choice = Integer.parseInt(bufferedReader.readLine());
+
+            switch (choice) {
+                case 1:
+                System.out.println("Format of the comments should be: (Status[e.g Qualified/Pending/Denied]).(CommentsWithNoSpaces)");
+                System.out.println("What is the comment inputted? : ");
+                String newComment = bufferedReader.readLine();
+                DataKafka.updateTryout(tryout, tryoutNo, newComment);
+                String[] words = newComment.split("\\.");
+                if (words[0].equals("Qualified")){
+                    DataKafka.updateApplicationStatus(tryout.getApplicationId(),"Qualified");
+                } else if (words[0].equals("Pending")){
+                    DataKafka.updateApplicationStatus(tryout.getApplicationId(),"Pending");
+                } else if (words[0].equals("Denied"))
+                    DataKafka.updateApplicationStatus(tryout.getApplicationId(),"Denied");
+
+                System.exit(0);
+                case 2: DataKafka.deleteTryout(tryoutNo);
+
                 case 3: mainMenu();
             }
         } else {
@@ -808,15 +880,26 @@ public class JavaKafkaAdmin {
         }
     }
 
+    public static void readAllTryout() throws Exception {
+        ArrayList<Tryouts> tryoutList = DataKafka.allTryOuts();
+        System.out.printf("%-20s %-20s %-20s %-20s  \n", "--------------", "----------", "-------------", "---------");
+        System.out.printf("%-20s %-20s %-20s %-20s  \n", "Tryout No", "TryoutId", "Application Id", "Comments");
+        System.out.printf("%-20s %-20s %-20s %-20s  \n", "--------------", "----------", "-------------", "---------");
+        for (Tryouts tryouts: tryoutList){
+            System.out.printf("%-20s %-20s %-20s %-20s \n", tryouts.getTryoutNo(), tryouts.getTryoutId(), tryouts.getApplicationId(), tryouts.getComments());
+        }
+    }
     public static void tryoutsMenu() throws Exception {
         while (true) {
             tryoutsList = DataKafka.getTryouts();
 
             System.out.println("\nView By: ");
-            System.out.println("1. All Tryouts");
+            System.out.println("1. Tryouts Venue");
             System.out.println("2. Coach");
             System.out.println("3. Sport");
-            System.out.println("4. Back to Main Menu");
+            System.out.println("4. All tryouts");
+            System.out.println("5. Or Create Tryouts Venue");
+            System.out.println("6. Back to Main Menu");
             System.out.print("Choice: ");
             int choice = Integer.parseInt(bufferedReader.readLine());
 
@@ -851,6 +934,18 @@ public class JavaKafkaAdmin {
                     sortTryoutsBySportName(sportName);
                 }
                 case 4 -> {
+                    readAllTryout();
+                    System.out.println("Select Tryout No: ");
+                    int tryoutNo = Integer.parseInt(bufferedReader.readLine());
+                    selectTryoutNo(tryoutNo);
+                    mainMenu();
+                    System.out.println();
+                }
+                case 5 -> {
+                    createTryoutDetails();
+                    System.out.println();
+                }
+                case 6 -> {
                     mainMenu();
                     System.out.println();
                 }
