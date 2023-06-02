@@ -1,0 +1,24 @@
+Changed List:
+
+Updated the uml
+Created methods in DataKafka.java such as
+allTryOuts
+selectTryoutByTryoutNo
+createTryouts
+updateTryout
+
+Also edited originally inputted methods such as 
+updateTryouts
+findApplicationsByApprovalStatus
+
+Created methods in JavaKafkaAdmin.java  such as 
+createTryoutDetails
+selectTryoutNo
+readAllTryout
+
+Also edited orginally inputted methods such as 
+tryoutsMenu
+
+Created a Tryouts Object Class
+
+Changed the conditions of some variables to accept null values in the sql file
