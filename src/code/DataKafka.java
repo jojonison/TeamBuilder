@@ -913,6 +913,8 @@ public class DataKafka {
             resultSet.close();
         }catch (Exception e){
             System.out.println("Could not find tryout details for sport " + sportID + ".");
+            System.out.println("Why not have a look at other sport tryouts?");
+            System.out.println("You might be interested with: ")
         }
         return tryoutDetail;
     }
@@ -1061,6 +1063,57 @@ public class DataKafka {
         tryoutPreparedStatement.setString(4, tryoutDetails.getLocation());
         tryoutPreparedStatement.setInt(5, tryoutDetails.getCoachID());
         tryoutPreparedStatement.execute();
+    }
+
+    /**
+     * SELECT *
+     * FROM TRYOUTDETAILS
+     * WHERE CoachID IN (
+     *     SELECT CoachID
+     *     FROM COACH
+     *     WHERE departmentkey = 'SEA'
+     * );
+     */
+    public static ArrayList<TryoutDetails> getDetailsOfSportByDepartment(String departmentKey) throws SQLException {
+        ArrayList<TryoutDetails> tryouts = new ArrayList<>();
+        String query = "SELECT *\n" +
+                "FROM TRYOUTDETAILS\n" +
+                "WHERE CoachID IN (\n" +
+                "    SELECT CoachID\n" +
+                "    FROM COACH\n" +
+                "    WHERE departmentkey = ?\n" +
+                ");";
+
+        PreparedStatement preparedStatement = connection.prepareStatement(query, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+        preparedStatement.setString(1, departmentKey);
+        ResultSet resultSet = preparedStatement.executeQuery();
+        resultSet.beforeFirst();
+
+        while (resultSet.next()) {
+            TryoutDetails tryoutDetails = new TryoutDetails(
+                    resultSet.getInt(1),
+                    resultSet.getInt(2),
+                    resultSet.getString(3),
+                    resultSet.getString(4),
+                    resultSet.getInt(5)
+            );
+            tryouts.add(tryoutDetails);
+        }
+        resultSet.close();
+        return tryouts;
+    }
+
+    public static String getDepartmentOfStudent(int studentID) throws SQLException {
+        String query = "select departmentkey from student where studentid = ?";
+        PreparedStatement preparedStatement = connection.prepareStatement(query, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+        preparedStatement.setInt(1, studentID);
+        ResultSet resultSet = preparedStatement.executeQuery();
+
+        if (resultSet.next()) {
+            return resultSet.getString(1);
+        }else {
+            return null;
+        }
     }
 
 }

@@ -4,6 +4,7 @@ import tables.*;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
@@ -108,13 +109,43 @@ public class JavaKafkaStudent {
         }
     }
 
+    public static void readSportDetailsByDep() throws SQLException {
+        ArrayList<TryoutDetails> sportDetailsByDep = DataKafka.getDetailsOfSportByDepartment(DataKafka.getDepartmentOfStudent(studentID));
+        if (sportDetailsByDep.isEmpty()) {
+            System.out.println("Looks like a tryout has not been opened, stay tuned!");
+        } else {
+            System.out.printf("%-20s %-20s %-20s %-20s %-20s\n", "--------", "----------", "----------", "------------", "--------");
+            System.out.printf("%-20s %-20s %-20s %-20s %-20s\n", "Tryout ID", "Sport ID", "Schedule", "Location", "coachid");
+            System.out.printf("%-20s %-20s %-20s %-20s %-20s\n", "--------", "----------", "----------", "------------", "-------");
+            for (TryoutDetails tryoutDetails : sportDetailsByDep) {
+                System.out.printf("%-20s %-20s %-20s %-20s %-20s\n",
+                        tryoutDetails.getTryoutID(),
+                        tryoutDetails.getSportID(),
+                        tryoutDetails.getSchedule(),
+                        tryoutDetails.getLocation(),
+                        tryoutDetails.getCoachID()
+                );
+            }
+        }
+    }
+
+    /**
+     * A student should not be able to apply if the coach has not set up a tryout for the sport
+     * @param sportID
+     * @throws Exception
+     */
     public static void selectSportId(int sportID) throws Exception {
         Sport sport = DataKafka.selectSportBySportID(sportID);
         Student student = DataKafka.selectStudentByStudentID(studentID);
         TryoutDetails sportDetails = DataKafka.getDetailsOfSportBySportID(sportID);
 
+        readSportDetailsByDep();
+
+        // Work in Progress
+
         if (sport != null){
             System.out.printf("%-20s %-20s %-20s \n", "Sport details: ", sport.getSportName(), sport.getSportType());
+
             System.out.println("\nApply to this sport? (Y/N): ");
             String apply = bufferedReader.readLine();
 
