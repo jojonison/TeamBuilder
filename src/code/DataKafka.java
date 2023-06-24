@@ -914,7 +914,7 @@ public class DataKafka {
         }catch (Exception e){
             System.out.println("Could not find tryout details for sport " + sportID + ".");
             System.out.println("Why not have a look at other sport tryouts?");
-            System.out.println("You might be interested with: ")
+            System.out.println("You might be interested with: ");
         }
         return tryoutDetail;
     }

@@ -103,6 +103,10 @@ public class JavaKafkaCoach {
         System.out.println("You have added a tryout");
     }
 
+    /**
+     * TODO: View/accept/reject applications
+     * @throws Exception
+     */
     public static void mainMenu() throws Exception {
         while (true) {
 
