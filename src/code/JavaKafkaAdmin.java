@@ -42,9 +42,9 @@ public class JavaKafkaAdmin {
                 int choice = Integer.parseInt(bufferedReader.readLine());
 
                 switch (choice) {
-                    case 1: DataKafka.updateApplicationStatus(applicationID, "Accepted");
-                    case 2: DataKafka.updateApplicationStatus(applicationID, "Denied");
-                    case 3: mainMenu();
+                    case 1 -> DataKafka.updateApplicationStatus(applicationID, "Accepted");
+                    case 2 -> DataKafka.updateApplicationStatus(applicationID, "Denied");
+                    case 3 -> mainMenu();
                 }
             } else {
                 System.out.println("\nChange Approval Status? (Y/N): ");

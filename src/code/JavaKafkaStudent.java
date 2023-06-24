@@ -222,12 +222,8 @@ public class JavaKafkaStudent {
                     String sportName = bufferedReader.readLine();
                     findSportBySportName(sportName);
                 }
-                case 3 -> {
-                    mainMenu();
-                }
-                default -> {
-                    System.out.println("Invalid input.");
-                }
+                case 3 -> mainMenu();
+                default -> System.out.println("Invalid input.");
             }
         }
     }
@@ -271,12 +267,8 @@ public class JavaKafkaStudent {
                     }
                     System.out.println();
                 }
-                case 4 -> {
-                    mainMenu();
-                }
-                default -> {
-                    System.out.println("Invalid input.");
-                }
+                case 4 -> mainMenu();
+                default -> System.out.println("Invalid input.");
             }
         }
     }
