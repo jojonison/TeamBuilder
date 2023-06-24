@@ -1,9 +1,6 @@
 package code;
 
-import tables.Application;
-import tables.Sport;
-import tables.Student;
-import tables.TryoutDetails;
+import tables.*;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -115,6 +112,7 @@ public class JavaKafkaStudent {
         Sport sport = DataKafka.selectSportBySportID(sportID);
         Student student = DataKafka.selectStudentByStudentID(studentID);
         TryoutDetails sportDetails = DataKafka.getDetailsOfSportBySportID(sportID);
+
         if (sport != null){
             System.out.printf("%-20s %-20s %-20s \n", "Sport details: ", sport.getSportName(), sport.getSportType());
             System.out.println("\nApply to this sport? (Y/N): ");

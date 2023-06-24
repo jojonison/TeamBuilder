@@ -70,6 +70,31 @@ public class DataKafka {
         return student;
     }
 
+    public static Coach coachLogIn(int coachID) throws Exception {
+        Coach coach = null;
+        try {
+            String query = "select * from coach where coachID = ?";
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1, coachID);
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+                coach = new Coach(
+                        resultSet.getInt("coachid"),
+                        resultSet.getString("firstname"),
+                        resultSet.getString("lastname"),
+                        resultSet.getInt("sportid"),
+                        resultSet.getString("departmentkey")
+                );
+            } else {
+                System.out.println("Account not found.");
+            }
+        } catch (Exception e) {
+            System.out.println("Account not found.");
+        }
+        return coach;
+    }
+
     public static ArrayList<Application> getApplications() throws Exception{
         ArrayList<Application> applications = new ArrayList<Application>();
         String query = "SELECT * FROM application ORDER BY applicationid";
@@ -259,6 +284,15 @@ public class DataKafka {
         return "No location yet.";
     }
 
+    /**
+     * make this so it needs a tryout detail before applying:
+     * a coach needs to put up a tryout detail first.
+     * so if there is nothing, then nothing.
+     * @param studentID
+     * @param sportID
+     * @param approvalStatus
+     * @param applicationDate
+     */
     public static void createApplication(int studentID, int sportID, String approvalStatus, String applicationDate){
         try {
             String appIDQuery = "SELECT MAX(applicationid) FROM application";
@@ -802,6 +836,31 @@ public class DataKafka {
         }
     }
 
+
+    public static ArrayList<TryoutDetails> getCoachCreatedTryoutDetails(int coachid) throws Exception {
+        ArrayList<TryoutDetails> tryoutDetails = new ArrayList<>();
+        String query = "select * from tryoutdetails where coachid = ?";
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(query, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            preparedStatement.setInt(1, coachid);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+               TryoutDetails tryout = new TryoutDetails(
+                       resultSet.getInt(1),
+                       resultSet.getInt(2),
+                       resultSet.getString(3),
+                       resultSet.getString(4),
+                       resultSet.getInt(5)
+               );
+               tryoutDetails.add(tryout);
+            }
+            resultSet.close();
+        }catch (Exception e) {
+            System.out.println("An error occurred");
+        }
+        return tryoutDetails;
+    }
+
     public static ArrayList<TryoutDetails> getTryouts() throws  Exception{
         ArrayList<TryoutDetails> tryouts = new ArrayList<TryoutDetails>();
         String query = "SELECT * FROM tryoutdetails ORDER BY tryoutid";
@@ -968,4 +1027,40 @@ public class DataKafka {
             System.exit(0);
         }
     }
+
+    public static int getCoachSport(int coachID) throws Exception {
+        String query = "select sportid from coach where coachid = ?";
+        int sportID = 0;
+
+        PreparedStatement preparedStatement = connection.prepareStatement(query, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+        preparedStatement.setInt(1, coachID);
+
+        ResultSet resultSet = preparedStatement.executeQuery();
+        while (resultSet.next()) {
+            Coach coach = new Coach(
+                    resultSet.getInt(1),
+                    resultSet.getString(1),
+                    resultSet.getString(1),
+                    resultSet.getInt(1),
+                    resultSet.getString(1)
+            );
+            sportID = coach.getSportID();
+        }
+        resultSet.close();
+
+        return sportID;
+    }
+
+
+    public static void coachAddTryout(TryoutDetails tryoutDetails) throws SQLException {
+        String tryoutQuery = "INSERT INTO tryoutdetails(tryoutid,sportid,schedule,location,coachid) VALUES(?,?,?,?,?)";
+        PreparedStatement tryoutPreparedStatement = connection.prepareStatement(tryoutQuery,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+        tryoutPreparedStatement.setInt(1, tryoutDetails.getTryoutID());
+        tryoutPreparedStatement.setInt(2, tryoutDetails.getSportID());
+        tryoutPreparedStatement.setString(3, tryoutDetails.getSchedule());
+        tryoutPreparedStatement.setString(4, tryoutDetails.getLocation());
+        tryoutPreparedStatement.setInt(5, tryoutDetails.getCoachID());
+        tryoutPreparedStatement.execute();
+    }
+
 }
