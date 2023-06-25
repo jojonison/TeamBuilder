@@ -6,6 +6,12 @@ public class Tryouts {
     public int applicationId;
     public String comments;
 
+    public Tryouts(int tryoutNo, int tryoutId, int applicationId) {
+        this.tryoutNo = tryoutNo;
+        this.tryoutId = tryoutId;
+        this.applicationId = applicationId;
+    }
+
     public Tryouts(int tryoutNo, int tryoutId, int applicationId, String comments){
         this.tryoutNo = tryoutNo;
         this.tryoutId = tryoutId;

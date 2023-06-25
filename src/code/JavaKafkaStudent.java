@@ -49,9 +49,7 @@ public class JavaKafkaStudent {
                     DataKafka.deleteApplication(applicationID);
                     DataKafka.deleteTryouts(application.getTryoutID());
                 }
-                case 3 -> {
-                    mainMenu();
-                }
+                case 3 -> mainMenu();
             }
         } else {
             System.out.println("Invalid input.");
@@ -109,10 +107,12 @@ public class JavaKafkaStudent {
         }
     }
 
-    public static void readSportDetailsByDep() throws SQLException {
-        ArrayList<TryoutDetails> sportDetailsByDep = DataKafka.getDetailsOfSportByDepartment(DataKafka.getDepartmentOfStudent(studentID));
+    public static void readSportDetailsByDep(int sportID) throws SQLException {
+        ArrayList<TryoutDetails> sportDetailsByDep = DataKafka.getDetailsOfSportByDepartment(sportID,DataKafka.getDepartmentOfStudent(studentID));
         if (sportDetailsByDep.isEmpty()) {
-            System.out.println("Looks like a tryout has not been opened, stay tuned!");
+            System.out.println("Sorry, looks like there is no tryout for this sport at the moment...stay tuned!");
+            System.out.println("Please restart the program");
+            System.exit(1);
         } else {
             System.out.printf("%-20s %-20s %-20s %-20s %-20s\n", "--------", "----------", "----------", "------------", "--------");
             System.out.printf("%-20s %-20s %-20s %-20s %-20s\n", "Tryout ID", "Sport ID", "Schedule", "Location", "coachid");
@@ -139,7 +139,7 @@ public class JavaKafkaStudent {
         Student student = DataKafka.selectStudentByStudentID(studentID);
         TryoutDetails sportDetails = DataKafka.getDetailsOfSportBySportID(sportID);
 
-        readSportDetailsByDep();
+        readSportDetailsByDep(sportID);
 
         // Work in Progress
 
@@ -150,24 +150,12 @@ public class JavaKafkaStudent {
             String apply = bufferedReader.readLine();
 
             if (apply.equalsIgnoreCase("y")) {
-                System.out.println("Enter year level: ");
-                int yearLevel = Integer.parseInt(bufferedReader.readLine());
-                System.out.println("Enter Department: ");
-                System.out.println(student.getDepartmentKey());
-                bufferedReader.readLine();
-                System.out.println("Sport Name: ");
-                System.out.println(sport.getSportName());
-                bufferedReader.readLine();
-                System.out.println("Sport Type: ");
-                System.out.println(sport.getSportType());
-                bufferedReader.readLine();
-                System.out.println("Tryout Schedule: ");
-                System.out.println(sportDetails);
-                bufferedReader.readLine();
 
-                LocalDate date = LocalDate.now();
-                DataKafka.createApplication(studentID,sport.getSportID(),"Pending", String.valueOf(date));
-                DataKafka.createTryout(DataKafka.getApplicationByStudentID(studentID));
+                System.out.println("Enter tryout ID: ");
+                int tryoutID = Integer.parseInt(bufferedReader.readLine());
+                DataKafka.studentApply(studentID, tryoutID, sportID);
+
+//                DataKafka.createTryout(DataKafka.getApplicationByStudentID(studentID));
             } else {
                 mainMenu();
             }
@@ -204,6 +192,10 @@ public class JavaKafkaStudent {
 
         while (true) {
             Student student = DataKafka.logIn(emailAddress, studentID);
+            if (student == null) {
+                System.out.println("Please try again");
+                System.exit(0);
+            }
             mainMenu();
         }
     }

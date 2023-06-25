@@ -99,7 +99,7 @@ public class JavaKafkaCoach {
         System.out.println("FORMAT: ");
         System.out.println("yyyy-mm-dd hh:mm:ss");
         System.out.println("\nExample: ");
-        System.out.println("2023-02-02 16:30:00");
+        System.out.println("2023-12-13 16:30:00");
         String schedule = bufferedReader.readLine();
 
         System.out.println("Enter the tryout location: ");

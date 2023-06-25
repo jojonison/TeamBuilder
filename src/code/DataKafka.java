@@ -5,6 +5,7 @@ import tables.*;
 import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 public class DataKafka {
@@ -302,6 +303,35 @@ public class DataKafka {
             throwables.printStackTrace();
         }
         return "No location yet.";
+    }
+
+    public static void studentApply(int studentID, int tryoutID, int sportID) {
+        LocalDate currentDate = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String formattedDate = currentDate.format(formatter);
+        try {
+            String appIDQuery = "SELECT MAX(applicationid) FROM application";
+            Statement appIDStatement = connection.createStatement();
+            ResultSet appIDResultSet = appIDStatement.executeQuery(appIDQuery);
+            int applicationID = 0;
+            if (appIDResultSet.next()){
+                applicationID = appIDResultSet.getInt(1);
+            }
+            int newAppID = applicationID + 1;
+
+            String applicationQuery = "insert into application(applicationid, studentid, sportid, tryoutid, approvalstatus, applicationdate) values(?,?,?,?,?,?)";
+            PreparedStatement preparedStatement = connection.prepareStatement(applicationQuery,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            preparedStatement.setInt(1, newAppID);
+            preparedStatement.setInt(2, studentID);
+            preparedStatement.setInt(3, sportID);
+            preparedStatement.setInt(4, tryoutID);
+            preparedStatement.setString(5, "Pending");
+            preparedStatement.setString(6, formattedDate);
+            preparedStatement.execute();
+            System.out.println("You have applied for sport: " + sportID);
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -1143,18 +1173,13 @@ public class DataKafka {
      *     WHERE departmentkey = 'SEA'
      * );
      */
-    public static ArrayList<TryoutDetails> getDetailsOfSportByDepartment(String departmentKey) throws SQLException {
+    public static ArrayList<TryoutDetails> getDetailsOfSportByDepartment(int sportID, String departmentKey) throws SQLException {
         ArrayList<TryoutDetails> tryouts = new ArrayList<>();
-        String query = "SELECT *\n" +
-                "FROM TRYOUTDETAILS\n" +
-                "WHERE CoachID IN (\n" +
-                "    SELECT CoachID\n" +
-                "    FROM COACH\n" +
-                "    WHERE departmentkey = ?\n" +
-                ");";
+        String query = "select * from tryoutdetails where tryoutdetails.sportid = ? and coachid in (select coachid from coach where departmentkey = ?);";
 
         PreparedStatement preparedStatement = connection.prepareStatement(query, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-        preparedStatement.setString(1, departmentKey);
+        preparedStatement.setInt(1, sportID);
+        preparedStatement.setString(2, departmentKey);
         ResultSet resultSet = preparedStatement.executeQuery();
         resultSet.beforeFirst();
 
