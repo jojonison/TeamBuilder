@@ -493,7 +493,7 @@ public class DataKafka {
             preparedStatement.setInt(4,coach.getSportID());
             preparedStatement.setString(5, coach.getDepartmentKey());
             preparedStatement.setInt(5, coachID);
-            preparedStatement.execute();
+            preparedStatement.execute(query);
             System.out.println("Coach " + coachID + " updated.");
         } catch (SQLException e) {
             e.printStackTrace();
@@ -901,7 +901,7 @@ public class DataKafka {
 
     public static TryoutDetails getDetailsOfSportBySportID(int sportID) {
         TryoutDetails tryoutDetail = null;
-        String query = "SELECT * FROM tryoutdetails LEFT OUTER JOIN sport ON tryoutdetails.sportid = sport.sportid WHERE sportid = ?";
+        String query = "SELECT * FROM tryoutdetails LEFT OUTER JOIN sport ON tryoutdetails.sportid = sport.sportid WHERE tryoutdetails.sportid = ?";
         try{
             PreparedStatement preparedStatement = connection.prepareStatement(query,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
             preparedStatement.setInt(1, sportID);
@@ -915,6 +915,7 @@ public class DataKafka {
             System.out.println("Could not find tryout details for sport " + sportID + ".");
             System.out.println("Why not have a look at other sport tryouts?");
             System.out.println("You might be interested with: ");
+//            e.printStackTrace();
         }
         return tryoutDetail;
     }
@@ -1114,6 +1115,29 @@ public class DataKafka {
         }else {
             return null;
         }
+    }
+
+    public static ArrayList<Application> coachViewApplications(int coachID) throws Exception {
+        ArrayList<Application> applications = new ArrayList<>();
+        String query = "SELECT * FROM application WHERE tryoutid IN (SELECT tryoutid FROM tryoutdetails WHERE coachid = ?);";
+
+        PreparedStatement preparedStatement = connection.prepareStatement(query, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+        preparedStatement.setInt(1, coachID);
+        ResultSet resultSet = preparedStatement.executeQuery();
+        resultSet.beforeFirst();
+
+        while (resultSet.next()) {
+            Application application = new Application(
+                    resultSet.getInt(1),
+                    resultSet.getInt(2),
+                    resultSet.getInt(3),
+                    resultSet.getInt(4),
+                    resultSet.getString(5),
+                    resultSet.getString(6)
+            );
+            applications.add(application);
+        }
+        return applications;
     }
 
 }
