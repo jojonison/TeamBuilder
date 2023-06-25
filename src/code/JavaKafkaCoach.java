@@ -10,14 +10,27 @@ import java.util.ArrayList;
 public class JavaKafkaCoach {
     public static BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
 
-    public static ArrayList<Sport> sportsList;
     public static ArrayList<TryoutDetails> tryoutsList;
     public static ArrayList<TryoutDetails> allExistingTryoutsList;
-    public static ArrayList<Department> departmentsList;
     public static ArrayList<Application> applications;
+    public static ArrayList<Tryout> tryoutResultsList;
 
     public static int coachID;
 
+
+    public static void readAllTryoutResults() {
+        System.out.printf("%-20s %-20s %-20s \n", "--------------", "---------", "------------------------------------------------------------------------");
+        System.out.printf("%-20s %-20s %-20s \n", "Application ID", "Tryout ID", "Comments");
+        System.out.printf("%-20s %-20s %-20s \n", "--------------", "---------", "------------------------------------------------------------------------");
+        for (Tryout tryout : tryoutResultsList) {
+            System.out.printf("%-20s %-20s %-20s \n",
+                    tryout.getApplicationID(),
+                    tryout.getTryoutID(),
+                    tryout.getComments()
+                    );
+        }
+
+    }
 
     public static void readAllTryoutDetails() {
         System.out.printf("%-20s %-20s %-20s %-20s %-20s \n", "--------------", "--------", "---------------", "---------------", "----------------");
@@ -158,17 +171,44 @@ public class JavaKafkaCoach {
         selectApplicationID(applicationID);
     }
 
+    public static void selectTryout(int applicationID) throws IOException {
+        Tryout tryout = DataKafka.selectTryoutByApplicationID(applicationID);
+        if (tryout != null) {
+            System.out.printf("%-20s %-20s %-20s \n", tryout.getApplicationID(), tryout.getTryoutID(), tryout.getComments());
+
+            System.out.println("Put a comment? (Y/N): ");
+            String change = bufferedReader.readLine();
+
+            if (change.equalsIgnoreCase("y")) {
+                System.out.println("Enter Comment (250 characters max): ");
+                String comment = bufferedReader.readLine();
+                DataKafka.updateComment(applicationID, comment);
+            } else {
+                System.out.println("Okay");
+            }
+        }
+    }
+
+    public static void resultsMenu() throws Exception {
+        tryoutResultsList = DataKafka.coachManageTryoutResults(coachID);
+        readAllTryoutResults();
+        System.out.println("Select Application ID: ");
+        int applicationID = Integer.parseInt(bufferedReader.readLine());
+        selectTryout(applicationID);
+    }
+
     /**
-     * TODO: View/accept/reject applications
+     * TODO: Comment on tryout
      */
     public static void mainMenu() throws Exception {
         while (true) {
 
             System.out.println("\nChoose what to do: ");
-            System.out.println("1. Show Created Tryouts");
-            System.out.println("2. Create a Tryout");
+            System.out.println("1. Show tryouts you have opened");
+            System.out.println("2. Open a tryout");
             System.out.println("3. Show applications");
-            System.out.println("4. Exit");
+            System.out.println("4. Manage tryout results ");
+            System.out.println("5. Exit");
             System.out.println("Choice: ");
             int choice = Integer.parseInt(bufferedReader.readLine());
 
@@ -176,7 +216,8 @@ public class JavaKafkaCoach {
                 case 1 -> tryoutsMenu();
                 case 2 -> createTryout();
                 case 3 -> applicationsMenu();
-                case 4 -> {
+                case 4 -> resultsMenu();
+                case 5 -> {
                     System.out.println("Come Again!");
                     System.exit(0);
                 }

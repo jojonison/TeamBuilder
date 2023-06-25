@@ -421,6 +421,19 @@ public class DataKafka {
         }
     }
 
+    public static void updateComment(int applicationID, String comment) {
+        String query = "update tryout set comments = ? where applicationid = ?";
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(query,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            preparedStatement.setString(1, comment);
+            preparedStatement.setInt(2, applicationID);
+            preparedStatement.executeUpdate();
+            System.out.println("Comment successfull");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     public static void deleteApplication(int applicationID){
         String query = "DELETE from application where applicationid = ?";
         try {
@@ -1153,15 +1166,6 @@ public class DataKafka {
         tryoutPreparedStatement.execute();
     }
 
-    /**
-     * SELECT *
-     * FROM TRYOUTDETAILS
-     * WHERE CoachID IN (
-     *     SELECT CoachID
-     *     FROM COACH
-     *     WHERE departmentkey = 'SEA'
-     * );
-     */
     public static ArrayList<TryoutDetails> getDetailsOfSportByDepartment(int sportID, String departmentKey) throws SQLException {
         ArrayList<TryoutDetails> tryouts = new ArrayList<>();
         String query = "select * from tryoutdetails where tryoutdetails.sportid = ? and coachid in (select coachid from coach where departmentkey = ?);";
@@ -1220,6 +1224,48 @@ public class DataKafka {
             applications.add(application);
         }
         return applications;
+    }
+
+    public static ArrayList<Tryout> coachManageTryoutResults(int coachID) throws Exception {
+        ArrayList<Tryout> tryouts = new ArrayList<>();
+        String query = "SELECT * FROM TRYOUT JOIN TRYOUTDETAILS ON TRYOUT.TryoutID = TRYOUTDETAILS.TryoutID WHERE TRYOUTDETAILS.CoachID = ?;";
+        PreparedStatement preparedStatement = connection.prepareStatement(query, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+        preparedStatement.setInt(1, coachID);
+        ResultSet resultSet = preparedStatement.executeQuery();
+        resultSet.beforeFirst();
+
+        while (resultSet.next()) {
+            Tryout tryout = new Tryout(
+              resultSet.getInt(1),
+              resultSet.getInt(2),
+              resultSet.getString(3)
+            );
+            tryouts.add(tryout);
+        }
+
+        return tryouts;
+    }
+
+    public static Tryout selectTryoutByApplicationID(int applicationID) {
+        Tryout tryout = null;
+        String query = "select * from tryout where applicationid = ?";
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(query,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            preparedStatement.setInt(1, applicationID);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            resultSet.beforeFirst();
+            while (resultSet.next()) {
+                tryout = new Tryout(
+                        resultSet.getInt(1),
+                        resultSet.getInt(2),
+                        resultSet.getString(3)
+                );
+            }
+            resultSet.close();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return tryout;
     }
 
 }
