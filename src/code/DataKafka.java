@@ -392,24 +392,13 @@ public class DataKafka {
 
     public static void createTryout(Application application){
         try {
-
-            String tryoutNoQuery = "SELECT MAX(tryoutNo) FROM tryouts";
-            Statement tryoutNoStatement = connection.createStatement();
-            ResultSet tryoutNoResultSet = tryoutNoStatement.executeQuery(tryoutNoQuery);
-            int tryoutNo = 0;
-            if (tryoutNoResultSet.next()){
-                tryoutNo = tryoutNoResultSet.getInt(1);
-            }
-            int newTryoutNo = tryoutNo + 1;
-
-            String tryoutQuery = "INSERT INTO tryouts(tryoutno,tryoutid,applicationid,comments) VALUES(?,?,?,?)";
+            String tryoutQuery = "INSERT INTO tryout(tryoutid,applicationid,comments) VALUES(?,?,?)";
             PreparedStatement tryoutPreparedStatement = connection.prepareStatement(tryoutQuery,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            tryoutPreparedStatement.setInt(1, newTryoutNo);
-            tryoutPreparedStatement.setInt(2, application.getTryoutID());
-            tryoutPreparedStatement.setInt(3, application.getApplicationID());
-            tryoutPreparedStatement.setString(4, "Pending");
+            tryoutPreparedStatement.setInt(1, application.getTryoutID());
+            tryoutPreparedStatement.setInt(2, application.getApplicationID());
+            tryoutPreparedStatement.setString(3, "Pending");
             tryoutPreparedStatement.execute();
-            System.out.println("Successfully applied tryouts.");
+            System.out.println("Tryout Added");
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -1106,7 +1095,7 @@ public class DataKafka {
             preparedStatement.execute();
             System.out.println("Tryout " + tryoutNo + " removed.");
         } catch (SQLException e) {
-            System.out.println("Failed to remove tryout " + tryoutNo + ".");
+            System.out.println("--------------------");
         }
     }
 

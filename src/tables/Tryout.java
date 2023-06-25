@@ -1,11 +1,11 @@
 package tables;
 
-public class tryout {
+public class Tryout {
     int applicationID;
     int tryoutID;
     String comments;
 
-    public tryout(int applicationID, int tryoutID, String comments) {
+    public Tryout(int applicationID, int tryoutID, String comments) {
         this.applicationID = applicationID;
         this.tryoutID = tryoutID;
         this.comments = comments;

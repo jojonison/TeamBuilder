@@ -154,8 +154,7 @@ public class JavaKafkaStudent {
                 System.out.println("Enter tryout ID: ");
                 int tryoutID = Integer.parseInt(bufferedReader.readLine());
                 DataKafka.studentApply(studentID, tryoutID, sportID);
-
-//                DataKafka.createTryout(DataKafka.getApplicationByStudentID(studentID));
+                DataKafka.createTryout(DataKafka.getApplicationByStudentID(studentID));
             } else {
                 mainMenu();
             }
