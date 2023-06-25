@@ -39,7 +39,6 @@ public class DataKafka {
         return tryouts;
     }
 
-
     public static Student logIn(String emailAdd, int password) throws Exception {
         Student student = null;
         try {
@@ -93,6 +92,27 @@ public class DataKafka {
             System.out.println("Account not found.");
         }
         return coach;
+    }
+
+    public static Application getApplicationByStudentID(int studentID) throws Exception{
+
+        String query = "SELECT * FROM application WHERE studentid = ?";
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(query, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            preparedStatement.setInt(1, studentID);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                if (resultSet.getInt(2) == studentID){
+                    System.out.println("Found one");
+                    return new Application(resultSet.getInt(1), resultSet.getInt(2), resultSet.getInt(3), resultSet.getInt(4), resultSet.getString(5), resultSet.getString(6));
+                }
+            }
+            resultSet.close();
+        } catch (Exception e) {
+            System.out.println("No applications found.");
+        }
+        System.out.println("Did not find one");
+        return null;
     }
 
     public static ArrayList<Application> getApplications() throws Exception{
@@ -293,6 +313,7 @@ public class DataKafka {
      * @param approvalStatus
      * @param applicationDate
      */
+
     public static void createApplication(int studentID, int sportID, String approvalStatus, String applicationDate){
         try {
             String appIDQuery = "SELECT MAX(applicationid) FROM application";
@@ -338,6 +359,34 @@ public class DataKafka {
             System.out.println("Failed to apply.");
         }
     }
+
+    public static void createTryout(Application application){
+        try {
+
+            String tryoutNoQuery = "SELECT MAX(tryoutNo) FROM tryouts";
+            Statement tryoutNoStatement = connection.createStatement();
+            ResultSet tryoutNoResultSet = tryoutNoStatement.executeQuery(tryoutNoQuery);
+            int tryoutNo = 0;
+            if (tryoutNoResultSet.next()){
+                tryoutNo = tryoutNoResultSet.getInt(1);
+            }
+            int newTryoutNo = tryoutNo + 1;
+
+            String tryoutQuery = "INSERT INTO tryouts(tryoutno,tryoutid,applicationid,comments) VALUES(?,?,?,?)";
+            PreparedStatement tryoutPreparedStatement = connection.prepareStatement(tryoutQuery,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            tryoutPreparedStatement.setInt(1, newTryoutNo);
+            tryoutPreparedStatement.setInt(2, application.getTryoutID());
+            tryoutPreparedStatement.setInt(3, application.getApplicationID());
+            tryoutPreparedStatement.setString(4, "Pending");
+            tryoutPreparedStatement.execute();
+            System.out.println("Successfully applied tryouts.");
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("Failed to apply tryouts.");
+        }
+    }
+
 
     public static void updateApplicationStatus(int applicationID, String approvalStatus) {
         String query = "UPDATE application SET approvalstatus=? WHERE applicationid=?";
@@ -482,6 +531,8 @@ public class DataKafka {
             System.out.println("Failed to add coach " + coach.getCoachID() + ".");
         }
     }
+
+
 
     public static void updateCoach(Coach coach, int coachID){
         String query = "UPDATE coach SET coachid=?, firstname=?, lastname=?, sportid=?, departmentkey WHERE coachid=?";
@@ -662,6 +713,23 @@ public class DataKafka {
     }
 
     public static void createTryouts(TryoutDetails tryoutDetails){
+        String query = "INSERT INTO tryoutdetails(tryoutid,sportid,schedule,location,coachid) VALUES(?,?,?,?,?)";
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(query,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            preparedStatement.setInt(1, tryoutDetails.getTryoutID());
+            preparedStatement.setInt(2, tryoutDetails.getSportID());
+            preparedStatement.setString(3, tryoutDetails.getSchedule());
+            preparedStatement.setString(4, tryoutDetails.getLocation());
+            preparedStatement.setInt(5, tryoutDetails.getCoachID());
+            preparedStatement.execute();
+            System.out.println("Tryout Details with the following details is added: \n" + tryoutDetails);
+
+        } catch (SQLException e) {
+            System.out.println("Failed to add Tryout Details " + tryoutDetails.getSportID() + ".");
+        }
+    }
+
+    public static void createTryout(TryoutDetails tryoutDetails){
         String query = "INSERT INTO tryoutdetails(tryoutid,sportid,schedule,location,coachid) VALUES(?,?,?,?,?)";
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(query,ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);

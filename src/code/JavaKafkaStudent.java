@@ -20,9 +20,9 @@ public class JavaKafkaStudent {
     public static String emailAddress;
 
     public static void readAllApplications(){
-        System.out.printf("%-20s %-20s %-20s %-20s %-20s %-20s \n", "--------------", "--------", "---------", "---------------", "---------------", "----------------");
-        System.out.printf("%-20s %-20s %-20s %-20s %-20s %-20s \n", "Application ID", "Sport ID", "Tryout ID", "Approval Status", "Approval Status", "Application Date");
-        System.out.printf("%-20s %-20s %-20s %-20s %-20s %-20s \n", "--------------", "--------", "---------", "---------------", "---------------", "----------------");
+        System.out.printf("%-20s %-20s %-20s %-20s %-20s \n", "--------------", "--------", "---------", "---------------", "----------------");
+        System.out.printf("%-20s %-20s %-20s %-20s %-20s \n", "Application ID", "Sport ID", "Tryout ID", "Approval Status", "Application Date");
+        System.out.printf("%-20s %-20s %-20s %-20s %-20s \n", "--------------", "--------", "---------", "---------------", "----------------");
         for (Application application: applicationsList){
             System.out.printf("%-20s %-20s %-20s %-20s %-20s \n", application.getApplicationID(), application.getSportID(), application.getTryoutID(), application.getApprovalStatus(), application.getApplicationDate());
         }
@@ -167,6 +167,7 @@ public class JavaKafkaStudent {
 
                 LocalDate date = LocalDate.now();
                 DataKafka.createApplication(studentID,sport.getSportID(),"Pending", String.valueOf(date));
+                DataKafka.createTryout(DataKafka.getApplicationByStudentID(studentID));
             } else {
                 mainMenu();
             }
@@ -275,6 +276,7 @@ public class JavaKafkaStudent {
                     System.out.println("\nSelect Application ID: ");
                     int applicationID = Integer.parseInt(bufferedReader.readLine());
                     selectApplicationID(applicationID);
+
                 }
                 case 2 -> {
                     System.out.println("\nEnter Sport Name: ");
