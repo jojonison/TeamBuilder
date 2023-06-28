@@ -226,7 +226,7 @@ public class JavaKafkaCoach {
     }
 
     public static void logIn() throws Exception {
-        System.out.println("Welcome to TeamBuilder! Please login your account to continue.");
+        System.out.println("Welcome to TeamBuilder! Please login your account to continue. (Press Enter on new Line)");
         bufferedReader.readLine();
 
         System.out.println("Coach ID: ");

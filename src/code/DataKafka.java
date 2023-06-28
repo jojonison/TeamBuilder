@@ -15,7 +15,7 @@ public class DataKafka {
 
     public static void setConnection(){
         try {
-            connection = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/kafka?useSSL=false","root","");
+            connection = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/kafka2?useSSL=false","root","");
         }catch (Exception e){
             e.printStackTrace();
             System.out.println("Data Connection Failed.");
@@ -194,6 +194,25 @@ public class DataKafka {
             System.out.println("Could not find tryoutNo " + tryoutNo + ".");
         }
         return tryout;
+    }
+
+    public static ArrayList<Application> findApplicationByApprovalStatusAndByID(String approvalStatus, int studentID) {
+        ArrayList<Application> applications = new ArrayList<>();
+        String query = "select * from application where approvalstatus = ? and studentID = ?";
+        try{
+            PreparedStatement preparedStatement = connection.prepareStatement(query, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            preparedStatement.setString(1, approvalStatus);
+            preparedStatement.setInt(2, studentID);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()){
+                Application application = new Application(resultSet.getInt(1), resultSet.getInt(2), resultSet.getInt(3), resultSet.getInt(4), resultSet.getString(5), resultSet.getString(6));
+                applications.add(application);
+            }
+            resultSet.close();
+        } catch (Exception e){
+            System.out.println("Could not find '" + approvalStatus  + "' applications.");
+        }
+        return applications;
     }
 
     public static ArrayList<Application> findApplicationsByApprovalStatus(String approvalStatus) {
@@ -1121,6 +1140,7 @@ public class DataKafka {
             System.out.println("Tryout " + tryoutID + " removed.");
         } catch (SQLException e) {
             System.out.println("Failed to remove tryout " + tryoutID + ".");
+            e.printStackTrace();
         }
     }
 

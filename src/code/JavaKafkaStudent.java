@@ -57,7 +57,8 @@ public class JavaKafkaStudent {
     }
 
     public static void sortApplicationsByApprovalStatus(String approvalStatus) throws Exception {
-        ArrayList<Application> byApprovalStatus = DataKafka.findApplicationsByApprovalStatus(approvalStatus);
+//        ArrayList<Application> byApprovalStatus = DataKafka.findApplicationsByApprovalStatus(approvalStatus);
+        ArrayList<Application> byApprovalStatus = DataKafka.findApplicationByApprovalStatusAndByID(approvalStatus, studentID);
         if (!byApprovalStatus.isEmpty()){
             for (Application application : byApprovalStatus) {
                 System.out.printf("%-20s %-20s %-20s %-20s %-20s \n", application.getApplicationID(), application.getSportID(), application.getTryoutID(), application.getApprovalStatus(), application.getApplicationDate());
@@ -180,7 +181,7 @@ public class JavaKafkaStudent {
     }
 
     public void logIn() throws Exception {
-        System.out.println("Welcome to TeamBuilder! Please login your account to continue.");
+        System.out.println("Welcome to TeamBuilder! Please login your account to continue. (Press Enter on new Line)");
         bufferedReader.readLine();
 
         System.out.println("Email Address: ");
